@@ -1,28 +1,37 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <DieComponent v-for="die in defaultItems"
+      :key="die.name"
+      :name="die.name"
+      :items="die.items"
+    >
+    </DieComponent>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import DieComponent from './components/DieComponent.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    DieComponent
+  },
+  data: function () {
+    return { defaultItems: [
+      {
+        name: 'action',
+        items: ['speak', 'sleep']
+      },
+      {
+        name: 'material',
+        items: ['wood', 'metal', 'electric boards', 'solar', 'wind']
+      }
+    ] }
   }
 }
 </script>
 
 <style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+@import "./style/main.scss";
 </style>
