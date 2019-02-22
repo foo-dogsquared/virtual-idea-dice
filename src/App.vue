@@ -1,37 +1,31 @@
 <template>
   <div id="app">
-    <DieComponent v-for="die in defaultItems"
-      :key="die.name"
-      :name="die.name"
-      :items="die.items"
-    >
-    </DieComponent>
+    <Header></Header>
+    <DieMenu></DieMenu>
+    <Footer></Footer>
   </div>
 </template>
 
 <script>
-import DieComponent from './components/DieComponent.vue'
+import DieMenu from './layouts/DieMenu.vue'
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
 
 export default {
   name: 'app',
   components: {
-    DieComponent
-  },
-  data: function () {
-    return { defaultItems: [
-      {
-        name: 'action',
-        items: ['speak', 'sleep']
-      },
-      {
-        name: 'material',
-        items: ['wood', 'metal', 'electric boards', 'solar', 'wind']
-      }
-    ] }
+    DieMenu,
+    Header,
+    Footer
   }
 }
 </script>
 
 <style lang="scss">
 @import "./style/main.scss";
+
+#app {@apply flex flex-col min-h-screen;}
+
+.die-menu {@apply flex-1;}
+
 </style>
