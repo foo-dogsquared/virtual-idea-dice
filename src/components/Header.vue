@@ -1,9 +1,15 @@
 <template>
   <header>
-    <h1>{{ appConstants.appName }}</h1>
-    <nav>
-      <div></div>
-    </nav>
+    <div class="wrapper header">
+      <div class="app-name-header">
+      <svg class="app-icon">
+          <use href="/icon.svg#icon" />
+      </svg>
+      <h1>{{ appConstants.appName }}</h1>
+      </div>
+      <nav>
+      </nav>
+    </div>
   </header>
 </template>
 
@@ -22,6 +28,14 @@ export default {
 
 <style lang="scss">
 header {
-  @apply flex flex-row w-full bg-grey-dark p-4 text-white;
+  @apply w-full bg-grey-dark p-4 mx-auto text-white;
+}
+
+.app-name-header {
+  @apply flex flex-row items-center;
+}
+
+.app-icon {
+  @apply w-12 h-12 fill-current text-white mr-4;
 }
 </style>

@@ -10,16 +10,18 @@
       @keyup.esc="$emit('done-edit-die-item')"
       >
     </div>
-    <div class="die-items">
+    <Draggable class="die-items" v-model="die.items" :options="draggableOptions">
       <div v-for="item in die.items"
       :key="item.id"
+      class="die-item-name"
       :class="{ editing: isDieItemEqual(die, item) }">
-        <label class="item-name" v-text="item.name" @click="$emit('edit-die-item', {die, item})"></label>
+        <label class="die-item-label" v-text="item.name" @click="$emit('edit-die-item', {die, item})" @dblclick="removeDieItem(item)"></label>
         <div class="die-item-actions">
           <div class="die-item-actions-flex">
             <input class="item-edit"
             @keyup.esc="$emit('done-edit-die-item')"
             @keyup.enter="$emit('done-edit-die-item')"
+            @keyup.delete="removeDieItem(item)"
             v-model="item.name"
             v-edit-item-focus="isDieItemEqual(die, item)"
             type="text"
@@ -33,7 +35,7 @@
       <button class="die-action-button add-die-item" @click.left="addDieItem()">
         Add item
       </button>
-    </div>
+    </Draggable>
     <button class="die-action-button remove-die" @click.left="$emit('remove-die', die)">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.954 21.03l-9.184-9.095 9.092-9.174-2.832-2.807-9.09 9.179-9.176-9.088-2.81 2.81 9.186 9.105-9.095 9.184 2.81 2.81 9.112-9.192 9.18 9.1z"/></svg>
     </button>
@@ -43,6 +45,7 @@
 <script>
 import * as _ from 'lodash'
 import * as appConstants from '../appConstants'
+import * as Draggable from 'vuedraggable'
 
 export default {
   name: 'DieComponent',
@@ -59,6 +62,9 @@ export default {
     },
     state: {
       type: String
+    },
+    draggableOptions: {
+      type: Object
     }
   },
   methods: {
@@ -74,6 +80,11 @@ export default {
     removeDieItem: function (item) {
       const itemIndex = this.die.items.indexOf(item)
       this.die.items.splice(itemIndex, 1)
+    },
+    // for drag events
+    onMove: function ({ relatedContext, draggedContext }) {
+      const relatedElement = relatedContext.element
+      return !relatedElement
     }
   },
   directives: {
@@ -83,6 +94,9 @@ export default {
     'edit-die-focus': function (el, binding) {
       if (binding.value) { el.focus() }
     }
+  },
+  components: {
+    Draggable
   }
 }
 </script>
@@ -94,12 +108,10 @@ input[type="email"], input[type="url"] {
 }
 
 .die {
-  @apply relative max-w-md min-h-full mx-auto w-full p-2 mt-2 mb-2 border-grey border-2 border-solid rounded flex flex-col items-center justify-center;
+  @apply relative max-w-md mx-auto w-full p-2 mt-2 mb-2 border-grey border-2 border-solid rounded flex flex-col items-center justify-center;
   @screen md {
-    @apply flex-row;
+    @apply w-md flex-row;
   }
-
-  .die-name-edit {@apply hidden;}
 
   &.renaming {
     & .die-name-edit {@apply block;}
@@ -114,23 +126,23 @@ input[type="email"], input[type="url"] {
   }
 }
 
+.die-name {
+  @apply cursor-pointer;
+  &:hover {@apply bg-grey-light;}
+}
+
+.die-name, .die-name-edit {@apply p-2;}
+
+.die-name-edit {@apply hidden;}
+
 .die-items {
   @apply w-full flex flex-row flex-wrap;
   & > * {
-    @apply w-full m-2 border-grey border-b-2;
+    @apply w-full m-2;
   }
-
-  & .die-item-actions {
-    @apply hidden;
-
-    & .item-edit {@apply w-3/4;}
-    & .remove-die-item {@apply w-1/4;}
-  }
-
-  .die-item-actions-flex {@apply flex flex-row;}
 
   & .editing {
-    & .item-name {@apply hidden;}
+    & .die-item-label {@apply hidden;}
     & .die-item-actions {@apply block;}
   }
 
@@ -139,5 +151,26 @@ input[type="email"], input[type="url"] {
   }
 
   @screen sm {& > * {@apply w-1/3;}}
+}
+
+.die-item-name {
+  @apply w-full m-2 flex justify-center items-end;
+  @screen sm {@apply w-1/3;}
+  @screen md {@apply border-grey border-b-2;}
+}
+
+.die-item-actions {
+  @apply hidden;
+
+  & .item-edit {@apply w-3/4;}
+  & .remove-die-item {@apply w-1/4;}
+}
+
+.die-item-actions-flex {@apply flex flex-row;}
+
+.die-item-label {
+  @apply cursor-pointer block p-1 w-full;
+
+  &:hover {@apply bg-grey-light;}
 }
 </style>
