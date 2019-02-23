@@ -24,8 +24,18 @@ export default {
 <style lang="scss">
 @import "./style/main.scss";
 
+a {@apply text-white;}
+
 #app {@apply flex flex-col min-h-screen;}
 
 .die-menu {@apply flex-1;}
+
+.wrapper {
+  @apply max-w-lg m-auto;
+
+  &.header, &.footer {
+    @apply flex flex-row items-center justify-between;
+  }
+}
 
 </style>
