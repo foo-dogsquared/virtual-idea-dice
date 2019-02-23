@@ -493,7 +493,16 @@ module.exports = {
     '1/6': '16.66667%',
     '5/6': '83.33333%',
     'full': '100%',
-    'screen': '100vw'
+    'screen': '100vw',
+    'xs': '20rem',
+    'sm': '30rem',
+    'md': '40rem',
+    'lg': '50rem',
+    'xl': '60rem',
+    '2xl': '70rem',
+    '3xl': '80rem',
+    '4xl': '90rem',
+    '5xl': '100rem'
   },
 
   /*
