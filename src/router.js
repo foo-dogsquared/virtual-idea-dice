@@ -10,14 +10,19 @@ export default new Router({
       component: Views.Home
     },
     {
-      path: appConstants.routes.about.path,
-      name: appConstants.routes.about.name,
+      path: appConstants.routes.gettingStarted.path,
+      name: appConstants.routes.gettingStarted.name,
       component: Views.About
     },
     {
       path: appConstants.routes.app.path,
       name: appConstants.routes.app.name,
       component: Views.App
+    },
+    {
+      path: appConstants.routes.ideas.path,
+      name: appConstants.routes.ideas.name,
+      component: Views.SavedIdeas
     }
   ]
 })

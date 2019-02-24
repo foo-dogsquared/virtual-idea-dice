@@ -20,7 +20,8 @@ export const appConfig = {
   },
   name: 'Digital Invention Dice',
   icon: '🎲',
-  tagline: 'Explore randomly generated ideas with your mind and imagination.'
+  tagline: 'Explore randomly generated ideas with your mind and imagination.',
+  repo: 'https://github.com/foo-dogsquared/digital-invention-cube'
 }
 
 export const routes = {
@@ -28,13 +29,17 @@ export const routes = {
     path: '/',
     name: 'home'
   },
-  about: {
-    path: '/about',
-    name: 'about'
+  gettingStarted: {
+    path: '/getting-started',
+    name: 'getting started'
   },
   app: {
     path: '/app',
     name: 'app'
+  },
+  ideas: {
+    path: '/saved-ideas',
+    name: 'saved ideas'
   }
 }
 
