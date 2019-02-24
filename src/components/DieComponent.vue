@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ renaming: isDieEqual(die) }" class="die">
+  <div :class="{ renaming: isDieEqual(die), disabled: !die.enabled }" class="die">
     <div class="die-type">
       <div class="die-name" v-text="die.name" @click="$emit('edit-die-name', die)"></div>
       <input class="die-name-edit" type="text"
@@ -19,9 +19,9 @@
         <div class="die-item-actions">
           <div class="die-item-actions-flex">
             <input class="item-edit"
-            @keyup.esc="$emit('done-edit-die-item')"
-            @keyup.enter="$emit('done-edit-die-item')"
-            @keyup.delete="removeDieItem(item)"
+            @keyup.esc.exact="$emit('done-edit-die-item')"
+            @keyup.enter.exact="$emit('done-edit-die-item')"
+            @keyup.ctrl.delete.exact="removeDieItem(item)"
             v-model="item.name"
             v-edit-item-focus="isDieItemEqual(die, item)"
             type="text"
@@ -32,12 +32,16 @@
           </div>
         </div>
       </div>
-      <button class="die-action-button add-die-item" @click.left="addDieItem()">
+      <button class="add-die-item" @click.left="addDieItem()">
         Add item
       </button>
     </Draggable>
     <button class="die-action-button remove-die" @click.left="$emit('remove-die', die)">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.954 21.03l-9.184-9.095 9.092-9.174-2.832-2.807-9.09 9.179-9.176-9.088-2.81 2.81 9.186 9.105-9.095 9.184 2.81 2.81 9.112-9.192 9.18 9.1z"/></svg>
+    </button>
+    <button class="die-action-button disable-die" @click.left="$emit('disable-die', die)">
+      <svg v-if="die.enabled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>
+      <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-4v14h18v-14h-12z"/></svg>
     </button>
   </div>
 </template>
@@ -75,7 +79,10 @@ export default {
       return this.state === appConstants.state.itemEditing && (this.editingDie !== null && this.editingDieItem !== null) && (_.isEqual(die, this.editingDie) && _.isEqual(dieItem, this.editingDieItem))
     },
     addDieItem: function () {
-      this.die.items.push({ itemId: appConstants.generateId(), name: `${this.die.name}-${this.die.items.length + 1}` })
+      const newDieItemId = appConstants.generateId()
+      const newDieItem = { itemId: newDieItemId, name: `${this.die.name}-${newDieItemId}` }
+      this.die.items.push(newDieItem)
+      this.$emit('edit-die-item', { die: this.die, item: newDieItem })
     },
     removeDieItem: function (item) {
       const itemIndex = this.die.items.indexOf(item)
@@ -108,14 +115,20 @@ input[type="email"], input[type="url"] {
 }
 
 .die {
-  @apply relative max-w-md mx-auto w-full p-2 mt-2 mb-2 border-grey border-2 border-solid rounded flex flex-col items-center justify-center;
-  @screen md {
-    @apply w-md flex-row;
-  }
+  @apply relative mx-auto min-h-48 w-full p-2 mt-2 mb-2 border-grey border-2 border-solid rounded flex flex-col items-center justify-center;
+  @screen md {@apply flex-row min-h-24;}
 
   &.renaming {
     & .die-name-edit {@apply block;}
     & .die-name {@apply hidden;}
+  }
+
+  &.disabled {
+    @apply bg-grey-light;
+
+    & .die-name {&:hover {@apply bg-grey-lighter;}}
+
+    & .die-item-label {&:hover {@apply bg-grey-lighter;}}
   }
 }
 
@@ -127,13 +140,18 @@ input[type="email"], input[type="url"] {
 }
 
 .die-name {
-  @apply cursor-pointer;
+  @apply cursor-pointer w-4/5;
   &:hover {@apply bg-grey-light;}
+
+  @screen md {@apply w-full;}
 }
 
 .die-name, .die-name-edit {@apply p-2;}
 
-.die-name-edit {@apply hidden;}
+.die-name-edit {
+  @apply hidden w-4/5;
+  @screen md {@apply w-full;}
+}
 
 .die-items {
   @apply w-full flex flex-row flex-wrap;
@@ -160,7 +178,7 @@ input[type="email"], input[type="url"] {
 }
 
 .die-item-actions {
-  @apply hidden;
+  @apply hidden w-full;
 
   & .item-edit {@apply w-3/4;}
   & .remove-die-item {@apply w-1/4;}
@@ -169,8 +187,18 @@ input[type="email"], input[type="url"] {
 .die-item-actions-flex {@apply flex flex-row;}
 
 .die-item-label {
-  @apply cursor-pointer block p-1 w-full;
+  @apply cursor-pointer block p-1 w-full break-words;
 
   &:hover {@apply bg-grey-light;}
+}
+
+.add-die-item {@apply p-1;}
+
+.die-action-button {
+  @apply rounded-none bg-grey;
+  &:hover {@apply bg-grey-dark;}
+
+  &.remove-die {@apply absolute h-8 w-8 pin-t pin-r;}
+  &.disable-die {@apply absolute h-8 w-8 pin-r; top: 2.25rem;}
 }
 </style>

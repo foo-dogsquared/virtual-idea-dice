@@ -1,5 +1,6 @@
 <template>
-    <div class="die-menu wrapper main">
+  <div class="die-menu">
+    <div class="dice">
       <DieComponent v-for="die in dice"
         :key="die.id"
         :die="die"
@@ -12,46 +13,38 @@
         @edit-die-item="editDieItem"
         @done-edit-die-item="doneEditDieItem"
         @remove-die="removeDie"
+        @disable-die="disableDie"
       >
       </DieComponent>
-      <GenerateIdeaLayout
-      :dice="dice"
-      :isIdeaSaved="isIdeaSaved"
-      :ideas="ideas"
-      @add-die="addDie"
-      @generate-idea="generateItems"
-      ></GenerateIdeaLayout>
-      <SaveIdeaLayout
-      :generatedIdea="ideas"
-      :isIdeaSaved="isIdeaSaved"
-      :savedIdeas="savedIdeas"
-      :editingIdeaSet="editingideaSet"
-      :state="state"
-      @save-idea="addIdea"
-      @remove-idea="removeIdea"
-      @edit-idea-set-name="editIdeaSetName"
-      @done-edit-idea-set-name="doneEditIdeaSetName"
-      ></SaveIdeaLayout>
     </div>
+    <GenerateIdeaLayout
+    :dice="dice"
+    :isIdeaSaved="isIdeaSaved"
+    :ideas="ideas"
+    @add-die="addDie"
+    @generate-idea="generateItems"
+    @clear-idea="clearGeneratedIdea"
+    @save-idea="addIdea"
+    ></GenerateIdeaLayout>
+  </div>
 </template>
 
 <script>
-import * as components from '../components'
+import components from '../components'
 import * as appConstants from '../appConstants'
+import GenerateIdeaLayout from './GenerateIdeaLayout.vue'
 
 export default {
   name: 'DieMenu',
   components: {
     DieComponent: components.DieComponent,
-    GenerateIdeaLayout: components.GenerateIdeaLayout,
-    SaveIdeaLayout: components.SaveIdeaLayout
+    GenerateIdeaLayout: GenerateIdeaLayout
   },
   data: function () {
     return {
       dice: [],
       editingDie: null,
       editingDieItem: null,
-      editingideaSet: null,
       state: null,
       ideas: [],
       savedIdeas: [],
@@ -76,20 +69,13 @@ export default {
       this.editingItemCache = null
       this.state = null
     },
-    editIdeaSetName: function (ideaSet) {
-      this.editingideaSet = ideaSet
-      this.state = appConstants.state.ideaSetRenaming
-    },
-    doneEditIdeaSetName: function () {
-      this.editingideaSet = null
-      this.state = null
-    },
 
     /*
     * Die-related functions
     */
     addDie: function () {
-      this.dice.push({ name: `NewDie${this.dice.length + 1}`, id: appConstants.generateId(), items: [ ] })
+      const newDieId = appConstants.generateId()
+      this.dice.push(new appConstants.Die(newDieId, `NewDie${newDieId}`))
     },
     /**
       @function removeDie
@@ -98,6 +84,10 @@ export default {
     **/
     removeDie: function (dieObject) {
       this.dice.splice(this.dice.indexOf(dieObject), 1)
+    },
+    disableDie: function (dieObject) {
+      const dieIndex = this.dice.indexOf(dieObject)
+      this.dice[dieIndex].enabled = !this.dice[dieIndex].enabled
     },
 
     /*
@@ -110,17 +100,19 @@ export default {
       const ideasArray = []
       this.dice.map(function (die) {
         if (die.items.length === 0) return
-        ideasArray.push(die.items[Math.floor(Math.random() * die.items.length)].name)
+        if (!die.enabled) return
+        ideasArray.push(die.items[Math.floor(Math.random() * die.items.length)])
       })
 
       this.ideas = ideasArray
     },
-    addIdea: function () {
-      this.savedIdeas.push({ 'id': appConstants.generateId(), 'shards': this.ideas, 'name': `Idea Set #${this.savedIdeas.length + 1}` })
-      this.isIdeaSaved = true
+    clearGeneratedIdea: function () {
+      this.ideas = []
     },
-    removeIdea: function (ideaObject) {
-      this.savedIdeas.splice(this.savedIdeas.indexOf(ideaObject), 1)
+    addIdea: function () {
+      const newIdeaSetId = appConstants.generateId()
+      this.savedIdeas.push({ 'id': newIdeaSetId, 'shards': this.ideas, 'name': `Idea Set #${newIdeaSetId}` })
+      this.isIdeaSaved = true
     }
   },
   watch: {
@@ -130,9 +122,10 @@ export default {
       },
       deep: true
     },
+
     savedIdeas: {
-      handler: function (ideas) {
-        appConstants.ideaStorage.save(ideas)
+      handler: function (ideaSet) {
+        appConstants.ideaStorage.save(ideaSet)
       },
       deep: true
     }
@@ -149,38 +142,12 @@ export default {
     appConstants.diceStorage.fetch().then(function (diceObject) {
       this.dice = diceObject
     }.bind(this))
-
-    appConstants.ideaStorage.fetch().then(function (ideasObject) {
-      this.savedIdeas = ideasObject
-    }.bind(this))
   }
 }
 </script>
 
 <style lang="scss">
-button {
-  @apply flex items-center justify-center cursor-pointer bg-grey;
-  @apply bg-transparent rounded-full border-2 border-grey;
-
-  &:hover {@apply bg-grey-darker text-white;}
-}
-
 .die-menu {
-  & > * {@apply m-auto;}
-
-  &:last-child {@apply mb-4;}
+  & > *:last-child {@apply mb-4;}
 }
-
-.die-action-button {
-  @apply rounded-none bg-grey;
-  &:hover {@apply bg-grey-dark;}
-
-  &.remove-die {@apply absolute h-8 w-8 pin-t pin-r;}
-  &.add-die-item {
-    @apply bg-transparent rounded-full border-2 border-grey p-1;
-
-    &:hover {@apply bg-grey-darker text-white;}
-  }
-}
-
 </style>

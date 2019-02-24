@@ -4,10 +4,9 @@
       <div>{{ currentDate }} © <a :href="appConstants.author.link">{{ appConstants.author.name }}</a></div>
       <div class="social-icons">
       <a v-for="(url, socialLink) in appConstants.author.socialLinks" :key="socialLink" :href="url">
-          <svg
-          class="icon">
+        <svg class="icon">
           <use :href="'/social-icons.svg#' + socialLink" />
-          </svg>
+        </svg>
       </a>
       </div>
     </div>
@@ -31,10 +30,6 @@ export default {
 </script>
 
 <style lang="scss">
-footer {
-  @apply w-full bg-grey-dark p-4 mx-auto text-white;
-}
-
 .social-icons {
   & > * {@apply ml-3 mr-3;}
 }

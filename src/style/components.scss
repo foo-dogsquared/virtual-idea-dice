@@ -1,0 +1,25 @@
+.wrapper {
+  @apply max-w-lg m-auto;
+
+  &.header, &.footer {
+    @apply flex flex-col items-center;
+    & > * {@apply mt-2 mb-2;}
+
+    @screen lg {@apply flex-row justify-between;}
+  }
+
+  &.main {
+    @apply w-full p-4 leading-normal;
+    @screen md {@apply leading-loose;}
+
+    h1 {@apply leading-normal;}
+
+    a {@apply text-black;}
+  }
+}
+
+.home, .getting-started {
+  & > * {@apply mb-4;}
+
+  a {@apply border-black border-2 border-dashed p-1 bg-grey-light;}
+}
