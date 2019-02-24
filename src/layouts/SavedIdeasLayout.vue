@@ -1,9 +1,12 @@
 <template>
-  <div class="save-idea-layout">
-    <button v-if="generatedIdea.length > 1 && !isIdeaSaved" class="save-idea" @click="$emit('save-idea')">Save idea</button>
-    <div v-if="isIdeaSaved && generatedIdea.length > 1">Your randomly generated idea setpieces has been saved!</div>
-    <div v-else-if="generatedIdea.length === 1">You only have one setpiece which is not really suitable for saving. Add another die and fill up some items.</div>
-    <div class="previous-ideas-container" :class="{ hidden: savedIdeas.length <= 0 }">
+  <div class="ideas">
+    <div v-if="savedIdeas.length <= 0">
+      <h1>You don't have any saved idea sets yet.</h1>
+      <div>Go ahead to the <router-link :to="appConstants.routes.app.path">app</router-link> itself, generate an idea set, and save it. You'll see it here.</div>
+    </div>
+    <div v-else class="previous-ideas-container">
+      <h1>Your saved idea sets</h1>
+      <p>Here is where your idea sets are saved in case you found some interesting insights on an idea and you don't want to lose it.</p>
       <div class="idea-container" v-for="idea in savedIdeas" :key="idea.key">
         <div class="idea-set-name" :class="{ renaming: isIdeaSetEqual(idea)}">
           <div v-text="idea.name" class="idea-set-label" @click="$emit('edit-idea-set-name', idea)"></div>
@@ -17,10 +20,10 @@
           >
         </div>
         <Draggable class="previous-idea" v-model="idea.shards" :options="previousIdeaDragOptions">
-          <li class="idea-shard" v-for="shard in idea.shards" :key="shard" v-text="shard"></li>
+            <li class="idea-shard" v-for="shard in idea.shards" :key="shard.itemId" v-text="shard.name"></li>
         </Draggable>
         <button class="delete-idea" @click="$emit('remove-idea', idea)">
-          <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M24 21h-17l-7-7.972 7-8.028h17v16zm-16.09-14l-5.252 6.023 5.247 5.977h14.095v-12h-14.09zm6.09 4.586l2.586-2.586 1.414 1.414-2.586 2.586 2.586 2.586-1.414 1.414-2.586-2.586-2.586 2.586-1.414-1.414 2.586-2.586-2.586-2.586 1.414-1.414 2.586 2.586z"/></svg>
+            <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M24 21h-17l-7-7.972 7-8.028h17v16zm-16.09-14l-5.252 6.023 5.247 5.977h14.095v-12h-14.09zm6.09 4.586l2.586-2.586 1.414 1.414-2.586 2.586 2.586 2.586-1.414 1.414-2.586-2.586-2.586 2.586-1.414-1.414 2.586-2.586-2.586-2.586 1.414-1.414 2.586 2.586z"/></svg>
         </button>
       </div>
     </div>
@@ -33,25 +36,11 @@ import * as _ from 'lodash'
 import * as appConstants from '../appConstants'
 
 export default {
-  name: 'SaveIdeaLayout',
+  name: 'PreviousIdeasLayout',
   props: {
-    generatedIdea: {
-      type: Array,
-      required: true
-    },
-    isIdeaSaved: {
-      type: Boolean,
-      required: true
-    },
     savedIdeas: {
       type: Array,
       required: true
-    },
-    state: {
-      type: String
-    },
-    editingIdeaSet: {
-      type: Object
     }
   },
   components: {
@@ -67,6 +56,9 @@ export default {
       return {
         animation: 500
       }
+    },
+    appConstants: function () {
+      return appConstants
     }
   },
   directives: {
@@ -80,21 +72,9 @@ export default {
 </script>
 
 <style lang="scss">
-.save-idea-layout {
-  & > * {@apply m-auto;}
-}
+.previous-ideas-container {@apply flex flex-col;}
 
-.save-idea {
-  @apply p-4;
-}
-
-.delete-idea {
-  @apply absolute border-none rounded-none w-10 h-10 pin-t pin-r;
-}
-
-.previous-ideas-container {@apply bg-grey-dark flex flex-col p-4 mb-4 mt-4;}
-
-.idea-container {@apply relative;}
+.idea-container {@apply bg-grey-light relative p-4 mb-4 mt-4;}
 
 .idea-set-name {
   &.renaming {
@@ -111,11 +91,10 @@ export default {
 
 .idea-shard {
   @apply bg-grey w-full p-4 m-3 cursor-pointer;
-  &:hover {@apply bg-grey-light;}
+  &:hover {@apply bg-grey-lighter;}
 
   @screen md {
     @apply w-1/5;
   }
 }
-
 </style>

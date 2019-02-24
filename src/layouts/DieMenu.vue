@@ -24,18 +24,8 @@
     @add-die="addDie"
     @generate-idea="generateItems"
     @clear-idea="clearGeneratedIdea"
-    ></GenerateIdeaLayout>
-    <SaveIdeaLayout
-    :generatedIdea="ideas"
-    :isIdeaSaved="isIdeaSaved"
-    :savedIdeas="savedIdeas"
-    :editingIdeaSet="editingideaSet"
-    :state="state"
     @save-idea="addIdea"
-    @remove-idea="removeIdea"
-    @edit-idea-set-name="editIdeaSetName"
-    @done-edit-idea-set-name="doneEditIdeaSetName"
-    ></SaveIdeaLayout>
+    ></GenerateIdeaLayout>
   </div>
 </template>
 
@@ -43,21 +33,18 @@
 import components from '../components'
 import * as appConstants from '../appConstants'
 import GenerateIdeaLayout from './GenerateIdeaLayout.vue'
-import SaveIdeaLayout from './SaveIdeaLayout.vue'
 
 export default {
   name: 'DieMenu',
   components: {
     DieComponent: components.DieComponent,
-    GenerateIdeaLayout: GenerateIdeaLayout,
-    SaveIdeaLayout: SaveIdeaLayout
+    GenerateIdeaLayout: GenerateIdeaLayout
   },
   data: function () {
     return {
       dice: [],
       editingDie: null,
       editingDieItem: null,
-      editingideaSet: null,
       state: null,
       ideas: [],
       savedIdeas: [],
@@ -82,20 +69,13 @@ export default {
       this.editingItemCache = null
       this.state = null
     },
-    editIdeaSetName: function (ideaSet) {
-      this.editingideaSet = ideaSet
-      this.state = appConstants.state.ideaSetRenaming
-    },
-    doneEditIdeaSetName: function () {
-      this.editingideaSet = null
-      this.state = null
-    },
 
     /*
     * Die-related functions
     */
     addDie: function () {
-      this.dice.push(new appConstants.Die(appConstants.generateId(), `NewDie${this.dice.length + 1}`))
+      const newDieId = appConstants.generateId()
+      this.dice.push(new appConstants.Die(newDieId, `NewDie${newDieId}`))
     },
     /**
       @function removeDie
@@ -130,11 +110,9 @@ export default {
       this.ideas = []
     },
     addIdea: function () {
-      this.savedIdeas.push({ 'id': appConstants.generateId(), 'shards': this.ideas, 'name': `Idea Set #${this.savedIdeas.length + 1}` })
+      const newIdeaSetId = appConstants.generateId()
+      this.savedIdeas.push({ 'id': newIdeaSetId, 'shards': this.ideas, 'name': `Idea Set #${newIdeaSetId}` })
       this.isIdeaSaved = true
-    },
-    removeIdea: function (ideaObject) {
-      this.savedIdeas.splice(this.savedIdeas.indexOf(ideaObject), 1)
     }
   },
   watch: {
@@ -144,9 +122,10 @@ export default {
       },
       deep: true
     },
+
     savedIdeas: {
-      handler: function (ideas) {
-        appConstants.ideaStorage.save(ideas)
+      handler: function (ideaSet) {
+        appConstants.ideaStorage.save(ideaSet)
       },
       deep: true
     }
@@ -162,10 +141,6 @@ export default {
   created: async function () {
     appConstants.diceStorage.fetch().then(function (diceObject) {
       this.dice = diceObject
-    }.bind(this))
-
-    appConstants.ideaStorage.fetch().then(function (ideasObject) {
-      this.savedIdeas = ideasObject
     }.bind(this))
   }
 }
