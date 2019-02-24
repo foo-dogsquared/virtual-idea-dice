@@ -1,22 +1,18 @@
 <template>
-  <div id="app">
-    <Header></Header>
-    <DieMenu></DieMenu>
-    <Footer></Footer>
-  </div>
+  <Default id="app">
+    <main class="wrapper main" name="content">
+      <router-view/>
+    </main>
+  </Default>
 </template>
 
 <script>
-import DieMenu from './layouts/DieMenu.vue'
-import Header from './components/Header.vue'
-import Footer from './components/Footer.vue'
+import layouts from './layouts'
 
 export default {
   name: 'app',
   components: {
-    DieMenu,
-    Header,
-    Footer
+    Default: layouts.Default
   }
 }
 </script>
@@ -24,18 +20,9 @@ export default {
 <style lang="scss">
 @import "./style/main.scss";
 
-a {@apply text-white;}
+#app {
+  @apply flex flex-col min-h-screen;
 
-#app {@apply flex flex-col min-h-screen;}
-
-.die-menu {@apply flex-1;}
-
-.wrapper {
-  @apply max-w-lg m-auto;
-
-  &.header, &.footer {
-    @apply flex flex-row items-center justify-between;
-  }
+  & > *:nth-child(2) {@apply flex-1;}
 }
-
 </style>
