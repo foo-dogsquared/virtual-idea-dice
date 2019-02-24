@@ -1,17 +1,5 @@
 import localforage from 'localforage'
 
-export const diceStorageKey = 'digital-invention-cubes'
-
-export const state = {
-  dieRenaming: 'die-renaming',
-  itemEditing: 'item-editing',
-  ideaSetRenaming: 'idea-set-renaming'
-}
-
-export function generateId () {
-  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
-}
-
 export const appName = 'Digital Invention Dice'
 export const author = {
   name: 'Gabriel Arazas',
@@ -26,10 +14,40 @@ export const author = {
 
 export const appConfig = {
   db: {
-    name: 'digital-invention-cubes',
+    name: 'digital-invention-dice',
     dieStoreName: 'dice',
     ideasStoreName: 'ideas'
+  },
+  name: 'Digital Invention Dice',
+  icon: '🎲',
+  tagline: 'Explore randomly generated ideas with your mind and imagination.'
+}
+
+export const routes = {
+  home: {
+    path: '/',
+    name: 'home'
+  },
+  about: {
+    path: '/about',
+    name: 'about'
+  },
+  app: {
+    path: '/app',
+    name: 'app'
   }
+}
+
+export const diceStorageKey = 'digital-invention-dice'
+
+export const state = {
+  dieRenaming: 'die-renaming',
+  itemEditing: 'item-editing',
+  ideaSetRenaming: 'idea-set-renaming'
+}
+
+export function generateId () {
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
 }
 
 export const diceStorageInstance = localforage.createInstance({
@@ -42,11 +60,20 @@ export const ideasStorageInstance = localforage.createInstance({
   name: diceStorageKey
 })
 
+export class Die {
+  constructor (id, name, items = [], enabled = true) {
+    this.name = name
+    this.id = id
+    this.items = items
+    this.enabled = enabled
+  }
+}
+
 export const diceStorage = {
   fetch: function () {
     const dice = []
     return diceStorageInstance.iterate(function (value, key, index) {
-      dice.push({ 'name': value.name, 'items': value.items, 'id': Number(key) })
+      dice.push(new Die(value.id, value.name, value.items, value.enabled))
     })
       .then(function () { return Promise.resolve(dice) })
       .catch(function (err) {
@@ -58,7 +85,7 @@ export const diceStorage = {
     diceStorageInstance.clear()
 
     for (const die of dice) {
-      diceStorageInstance.setItem(String(die.id), { 'name': die.name, 'items': die.items })
+      diceStorageInstance.setItem(String(die.id), die)
     }
   }
 }
