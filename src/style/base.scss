@@ -1,0 +1,19 @@
+html {@apply text-lg;}
+
+button {
+  @apply flex items-center justify-center cursor-pointer bg-grey;
+  @apply bg-transparent rounded-full border-2 border-grey;
+  
+  &.disabled {@apply bg-grey text-grey-lighter cursor-not-allowed;}
+  &:hover {@apply bg-grey-darker text-white;}
+}
+
+a {@apply text-white;}
+
+header {
+  @apply w-full bg-grey-dark p-4 mx-auto text-white;
+}
+
+footer {
+  @apply w-full bg-grey-dark p-4 mx-auto text-white;
+}

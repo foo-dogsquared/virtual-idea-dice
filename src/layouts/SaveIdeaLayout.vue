@@ -2,7 +2,7 @@
   <div class="save-idea-layout">
     <button v-if="generatedIdea.length > 1 && !isIdeaSaved" class="save-idea" @click="$emit('save-idea')">Save idea</button>
     <div v-if="isIdeaSaved && generatedIdea.length > 1">Your randomly generated idea setpieces has been saved!</div>
-    <div v-else-if="generatedIdea.length === 1">You only have one setpiece which is not really suitable for saving.</div>
+    <div v-else-if="generatedIdea.length === 1">You only have one setpiece which is not really suitable for saving. Add another die and fill up some items.</div>
     <div class="previous-ideas-container" :class="{ hidden: savedIdeas.length <= 0 }">
       <div class="idea-container" v-for="idea in savedIdeas" :key="idea.key">
         <div class="idea-set-name" :class="{ renaming: isIdeaSetEqual(idea)}">

@@ -1,0 +1,20 @@
+.wrapper {
+  @apply max-w-lg m-auto;
+
+  &.header, &.footer {
+    @apply flex flex-col items-center;
+    & > * {@apply mt-2 mb-2;}
+
+    @screen md {@apply flex-row justify-between;}
+  }
+
+  &.main {
+    @apply w-full p-4;
+
+    a {@apply text-black;}
+  }
+}
+
+.home {
+  & > * {@apply mb-4;}
+}
