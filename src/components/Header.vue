@@ -29,7 +29,8 @@ export default {
 
 <style lang="scss">
 .nav-links {
-  & > * {@apply ml-4 mr-4;}
+  @apply flex items-center;
+  & > * {@apply ml-4 mr-4 text-center;}
 }
 
 .app-name-header {

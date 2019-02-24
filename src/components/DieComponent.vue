@@ -79,9 +79,10 @@ export default {
       return this.state === appConstants.state.itemEditing && (this.editingDie !== null && this.editingDieItem !== null) && (_.isEqual(die, this.editingDie) && _.isEqual(dieItem, this.editingDieItem))
     },
     addDieItem: function () {
-      const newDie = { itemId: appConstants.generateId(), name: `${this.die.name}-${this.die.items.length + 1}` }
-      this.die.items.push(newDie)
-      this.$emit('edit-die-item', { die: this.die, item: newDie })
+      const newDieItemId = appConstants.generateId()
+      const newDieItem = { itemId: newDieItemId, name: `${this.die.name}-${newDieItemId}` }
+      this.die.items.push(newDieItem)
+      this.$emit('edit-die-item', { die: this.die, item: newDieItem })
     },
     removeDieItem: function (item) {
       const itemIndex = this.die.items.indexOf(item)
@@ -186,7 +187,7 @@ input[type="email"], input[type="url"] {
 .die-item-actions-flex {@apply flex flex-row;}
 
 .die-item-label {
-  @apply cursor-pointer block p-1 w-full;
+  @apply cursor-pointer block p-1 w-full break-words;
 
   &:hover {@apply bg-grey-light;}
 }
