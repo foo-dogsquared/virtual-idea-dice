@@ -2,12 +2,13 @@
   <header>
     <div class="wrapper header">
       <div class="app-name-header">
-      <svg class="app-icon">
-          <use href="/icon.svg#icon" />
-      </svg>
-      <h1>{{ appConstants.appName }}</h1>
+        <svg class="app-icon">
+            <use href="/icon.svg#icon" />
+        </svg>
+        <h1>{{ appConstants.appName }}</h1>
       </div>
-      <nav>
+      <nav class="nav-links">
+        <router-link v-for="route in appConstants.routes" :key="route.name" :to="route.path" v-text="route.name"></router-link>
       </nav>
     </div>
   </header>
@@ -27,8 +28,8 @@ export default {
 </script>
 
 <style lang="scss">
-header {
-  @apply w-full bg-grey-dark p-4 mx-auto text-white;
+.nav-links {
+  & > * {@apply ml-4 mr-4;}
 }
 
 .app-name-header {
