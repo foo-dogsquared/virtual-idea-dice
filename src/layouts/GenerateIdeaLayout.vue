@@ -6,7 +6,7 @@
       <h1>{{ totalCombinations }} {{ (totalCombinations > 1) ? 'combinations' : 'combination'}}</h1>
       <div>with</div>
       <h1>{{ totalNumberOfDice }} {{ (totalNumberOfDice > 1) ? 'dice' : 'die' }}</h1>
-      <h2 v-if="totalNumberOfEmptyDice > 0">(with {{ totalNumberOfEmptyDice }} empty dice)</h2>
+      <h2 v-if="totalNumberOfEmptyDice > 0">(and {{ totalNumberOfEmptyDice }} empty {{ (totalNumberOfEmptyDice > 1) ? 'dice' : 'die' }})</h2>
     </div>
     <div class="die-combinations-stats" v-else-if="dice.length > 0 && dice.length === totalNumberOfAllEmptyDice">
       <h1>Seems like all of the dice is empty.</h1>
@@ -14,7 +14,10 @@
     </div>
     <div v-else-if="dice.length <= 0" class="die-combinations-stats">
       <h1>No die. No try. 😁</h1>
-      <div v-if="dice.length <= 0">You don't have any dice yet. Add a die and name the items that you want to be included.</div>
+      <div v-if="dice.length <= 0">
+        <p>You don't have any dice yet. Add a die and name the items that you want to be included.</p>
+        <p>Otherwise, you could see a <a @click="$emit('set-sample-set')">sample dice set straight from Atomic Shrimp's Invention Dice</a> (look up this <a href="https://www.youtube.com/watch?v=NBdVpiWUKhU">video</a> for reference).</p>
+      </div>
     </div>
 
     <!-- Action buttons -->
@@ -123,13 +126,11 @@ export default {
 
 .action-buttons {
   @apply flex flex-col justify-around;
-  & > * {@apply m-4}
+  & > button {@apply m-4 p-4;}
   @screen sm {@apply flex-row;}
 }
 
 .die-combinations-stats {@apply text-center;}
-
-.generate-idea, .add-die, .clear-idea {@apply p-4;}
 
 .idea-result {
   @apply bg-grey flex flex-row flex-wrap items-center justify-center mt-4 mb-4 p-3;

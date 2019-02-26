@@ -1,9 +1,9 @@
 <template>
   <footer>
     <div class="wrapper footer">
-      <div>{{ currentDate }} © <a :href="appConstants.author.link">{{ appConstants.author.name }}</a></div>
+      <div>{{ currentDate }} © <a :href="appConstants.author.link" target="_blank">{{ appConstants.author.name }}</a></div>
       <div class="social-icons">
-      <a v-for="(url, socialLink) in appConstants.author.socialLinks" :key="socialLink" :href="url">
+      <a v-for="(url, socialLink) in appConstants.author.socialLinks" :key="socialLink" :href="url" target="_blank">
         <svg class="icon">
           <use :href="'/social-icons.svg#' + socialLink" />
         </svg>

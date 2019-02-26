@@ -3,6 +3,7 @@
     <SavedIdeasLayout
     :savedIdeas="savedIdeas"
     :editingIdeaSet="editingideaSet"
+    :state="state"
     @remove-idea="removeIdea"
     @edit-idea-set-name="editIdeaSetName"
     @done-edit-idea-set-name="doneEditIdeaSetName"
