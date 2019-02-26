@@ -21,7 +21,7 @@
             <input class="item-edit"
             @keyup.esc.exact="$emit('done-edit-die-item')"
             @keyup.enter.exact="$emit('done-edit-die-item')"
-            @keyup.ctrl.delete.exact="removeDieItem(item)"
+            @keyup.shift.delete.exact="removeDieItem(item)"
             v-model="item.name"
             v-edit-item-focus="isDieItemEqual(die, item)"
             type="text"
@@ -36,10 +36,10 @@
         Add item
       </button>
     </Draggable>
-    <button class="die-action-button remove-die" @click.left="$emit('remove-die', die)">
+    <button v-tooltip="'Remove die'" class="die-action-button remove-die" @click.left="$emit('remove-die', die)">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.954 21.03l-9.184-9.095 9.092-9.174-2.832-2.807-9.09 9.179-9.176-9.088-2.81 2.81 9.186 9.105-9.095 9.184 2.81 2.81 9.112-9.192 9.18 9.1z"/></svg>
     </button>
-    <button class="die-action-button disable-die" @click.left="$emit('disable-die', die)">
+    <button v-tooltip="'Disable die'" class="die-action-button disable-die" @click.left="$emit('disable-die', die)">
       <svg v-if="die.enabled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>
       <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-4v14h18v-14h-12z"/></svg>
     </button>
@@ -50,6 +50,7 @@
 import * as _ from 'lodash'
 import * as appConstants from '../appConstants'
 import * as Draggable from 'vuedraggable'
+import { VTooltip } from 'v-tooltip'
 
 export default {
   name: 'DieComponent',
@@ -80,7 +81,7 @@ export default {
     },
     addDieItem: function () {
       const newDieItemId = appConstants.generateId()
-      const newDieItem = { itemId: newDieItemId, name: `${this.die.name}-${newDieItemId}` }
+      const newDieItem = new appConstants.DieItem(`${this.die.name}-${newDieItemId}`, newDieItemId)
       this.die.items.push(newDieItem)
       this.$emit('edit-die-item', { die: this.die, item: newDieItem })
     },
@@ -100,7 +101,8 @@ export default {
     },
     'edit-die-focus': function (el, binding) {
       if (binding.value) { el.focus() }
-    }
+    },
+    'tooltip': VTooltip
   },
   components: {
     Draggable
@@ -124,7 +126,7 @@ input[type="email"], input[type="url"] {
   }
 
   &.disabled {
-    @apply bg-grey-light;
+    @apply bg-grey-light shadow-lg;
 
     & .die-name {&:hover {@apply bg-grey-lighter;}}
 
@@ -146,10 +148,10 @@ input[type="email"], input[type="url"] {
   @screen md {@apply w-full;}
 }
 
-.die-name, .die-name-edit {@apply p-2;}
+.die-name, .die-name-edit {@apply p-2 min-h-8;}
 
 .die-name-edit {
-  @apply hidden w-4/5;
+  @apply hidden w-4/5 p-2;
   @screen md {@apply w-full;}
 }
 
@@ -180,16 +182,21 @@ input[type="email"], input[type="url"] {
 .die-item-actions {
   @apply hidden w-full;
 
-  & .item-edit {@apply w-3/4;}
+  & .item-edit {@apply w-3/4 p-2;}
   & .remove-die-item {@apply w-1/4;}
 }
+
+.die-item-label, .item-edit {@apply min-h-8 p-2;}
 
 .die-item-actions-flex {@apply flex flex-row;}
 
 .die-item-label {
   @apply cursor-pointer block p-1 w-full break-words;
 
-  &:hover {@apply bg-grey-light;}
+  &:hover {
+    @apply bg-grey-light;
+    transition: .2s;
+  }
 }
 
 .add-die-item {@apply p-1;}
