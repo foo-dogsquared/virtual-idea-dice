@@ -1,6 +1,6 @@
 import localforage from 'localforage'
 
-export const appName = 'Digital Invention Dice'
+export const appName = 'Virtual Idea Dice'
 export const author = {
   name: 'Gabriel Arazas',
   alias: 'foo-dogsquared',
@@ -14,15 +14,53 @@ export const author = {
 
 export const appConfig = {
   db: {
-    name: 'digital-invention-dice',
+    name: 'virtual-idea-dice',
     dieStoreName: 'dice',
     ideasStoreName: 'ideas'
   },
-  name: 'Digital Invention Dice',
+  name: 'Virtual Idea Dice',
   icon: '🎲',
   tagline: 'Explore randomly generated ideas with your mind and imagination.',
-  repo: 'https://github.com/foo-dogsquared/digital-invention-cube'
+  repo: 'https://github.com/foo-dogsquared/virtual-idea-dice'
 }
+
+export const appHighlights = [
+  {
+    header: `Inspired from Atomic Shrimp's Invention Dice`,
+    description: [
+      `This app is inspired from <a href="https://www.youtube.com/watch?v=NBdVpiWUKhU" target="_blank">Atomic Shrimp's Invention Dice</a>.`,
+      `In this case, I made the app to be fully customizable for the user in order to explore with their own set of attributes that they've put together.`
+    ]
+  },
+  {
+    header: 'Create your own set of dice',
+    description: [
+      "It's like Lego but with dice. Want to create your idea dice set for games? Why not!",
+      "What about food? Places? Programs? Hobbies? Or anything? That's your stuff to make!",
+      'The only limit here is your imagination (and your categorizing skills).'
+    ]
+  },
+  {
+    header: 'Share your idea dice set',
+    description: [
+      `It's possible to share your virtual idea dice set (or VIDS as I like to call them) with others through exporting and importing of your VIDS.`
+    ]
+  },
+  {
+    header: 'Almost like a native mobile app',
+    description: [
+      `It's built with mobile-first approach so it can feel like a native mobile app (and skip the developer fees for me) which you can do by adding the app to the home screen.`,
+      `Also it works offline once you visited this app. Go on and give it a try.`
+    ]
+  },
+  {
+    header: "It's free (and open source) real software",
+    description: [
+      `Its code is free and open to everyone which you can view it right <a href=${appConfig.repo} target="_blank">here</a>.`,
+      `Which means you can help improve this project whether by suggestions, criticisms, or code.`
+    ]
+  }
+]
 
 export const routes = {
   home: {
@@ -43,7 +81,7 @@ export const routes = {
   }
 }
 
-export const diceStorageKey = 'digital-invention-dice'
+export const diceStorageKey = 'virtual-idea-dice'
 
 export const state = {
   dieRenaming: 'die-renaming',
@@ -73,6 +111,22 @@ export class Die {
     this.enabled = enabled
   }
 }
+
+export class DieItem {
+  constructor (name, id = generateId()) {
+    this.itemId = id
+    this.name = name
+  }
+}
+
+export const atomicShrimpSampleDiceSet = [
+  new Die(generateId(), 'Power source', [ new DieItem('Manual'), new DieItem('Electric'), new DieItem('Clockwork'), new DieItem('Solar'), new DieItem('Wind'), new DieItem('Water') ]),
+  new Die(generateId(), 'Size', [ new DieItem('Giant'), new DieItem('Mini'), new DieItem('Pocket'), new DieItem('Portable'), new DieItem('Inhabitable'), new DieItem('Wearable') ]),
+  new Die(generateId(), 'Material', [ new DieItem('Metal'), new DieItem('Wood'), new DieItem('Plastic'), new DieItem('Edible'), new DieItem('Organic'), new DieItem('Paper') ]),
+  new Die(generateId(), 'Device', [ new DieItem('Robot'), new DieItem('Vehicle'), new DieItem('Game'), new DieItem('Tool'), new DieItem('Art'), new DieItem('Computer') ]),
+  new Die(generateId(), 'Scope', [ new DieItem('Family'), new DieItem('Personal'), new DieItem('Office'), new DieItem('Industrial'), new DieItem('Public'), new DieItem('Home') ]),
+  new Die(generateId(), 'Implementation type', [ new DieItem('Random'), new DieItem('Flying'), new DieItem('Underwater'), new DieItem('Stealth'), new DieItem('Disposable'), new DieItem('Self-build') ])
+]
 
 export const diceStorage = {
   fetch: function () {
