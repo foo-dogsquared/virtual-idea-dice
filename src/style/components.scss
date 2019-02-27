@@ -27,24 +27,21 @@
 
 .app-highlights {
   & > .feature-description {
-    @apply min-h-32 mb-8;
-    & > * {@screen md {@apply ml-2 mr-2;}}
-    @screen md {
-      @apply min-h-48
-      & > .feature-description {@apply flex}
-    }
+    @apply min-h-16 mb-8;
+    @screen md {@apply min-h-48}
   }
+}
 
-  & > .feature-description:nth-child(even) {
-    @screen md {@apply flex flex-row-reverse;}
-  }
-  & > .feature-description:nth-child(odd) {
-    @screen md {@apply flex flex-row;}
+.feature-description {
+  @screen md {
+    @apply flex flex-row;
+    .feature-image {@apply mr-4;}
+    .feature-text {@apply ml-4;}
   }
 }
 
 .feature-image {
-  @apply hidden min-w-1/4;
+  @apply hidden min-w-1/4 p-4;
 
   @screen md {@apply block;}
 }

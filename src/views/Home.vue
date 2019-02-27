@@ -7,7 +7,8 @@
       v-for="highlights in appConstants.appHighlights"
       :key="highlights.header"
       :header="highlights.header"
-      :descriptionList="highlights.description">
+      :descriptionList="highlights.description"
+      :img="'/home-icons.svg#' + highlights.img">
       </HighlightsListItem>
     </div>
     <p>To get started, head on over to the <router-link :to="appConstants.routes.app.path">app</router-link> and create your own set of idea dice.</p>
