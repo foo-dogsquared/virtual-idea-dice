@@ -1,5 +1,10 @@
 <template>
-  <div class="die-menu">
+  <div class="die-menu"
+  @keyup.self.enter.exact="addDie"
+  @keyup.self.ctrl.71.exact.prevent="clearGeneratedIdea"
+  @keyup.self.ctrl.shift.69.exact.prevent="exportFile"
+  @keyup.self.ctrl.shift.73.exact.prevent="importFile"
+  >
     <div class="dice">
       <DieComponent v-for="die in dice"
         :key="die.id"
@@ -25,7 +30,13 @@
     @generate-idea="generateItems"
     @clear-idea="clearGeneratedIdea"
     @save-idea="addIdea"
+    @set-sample-set="setSampleSet"
     ></GenerateIdeaLayout>
+    <div class="action-buttons">
+      <button class="export-dice" :class="{disabled: dice.length <= 0}" :disabled="dice.length <= 0" @click="exportFile">Export dice</button>
+      <input type="file" id="import-file-dice-form" accept="application/json" @change="importFile" hidden>
+      <button class="import-file-dice-button" @click="openFilePrompt">Import dice (file)</button>
+    </div>
   </div>
 </template>
 
@@ -33,6 +44,7 @@
 import components from '../components'
 import * as appConstants from '../appConstants'
 import GenerateIdeaLayout from './GenerateIdeaLayout.vue'
+import { saveAs } from 'file-saver'
 
 export default {
   name: 'DieMenu',
@@ -78,9 +90,9 @@ export default {
       this.dice.push(new appConstants.Die(newDieId, `NewDie${newDieId}`))
     },
     /**
-      @function removeDie
+      @function removeDie - removes the die passed as the parameter
 
-      @param
+      @param dieObject - the die to be removed
     **/
     removeDie: function (dieObject) {
       this.dice.splice(this.dice.indexOf(dieObject), 1)
@@ -88,6 +100,32 @@ export default {
     disableDie: function (dieObject) {
       const dieIndex = this.dice.indexOf(dieObject)
       this.dice[dieIndex].enabled = !this.dice[dieIndex].enabled
+    },
+    setSampleSet: function () {
+      this.dice = appConstants.atomicShrimpSampleDiceSet
+    },
+
+    /*
+     * file related functions
+     */
+    openFilePrompt: function () {
+      document.querySelector("input[type='file']#import-file-dice-form").click()
+    },
+    importFile: function () {
+      const files = document.querySelector("input[type='file']#import-file-dice-form").files
+      for (const file of files) {
+        const fileReader = new FileReader()
+        fileReader.addEventListener('loadend', function (event) {
+          this.dice = JSON.parse(event.target.result)
+        }.bind(this))
+        fileReader.readAsText(file)
+      }
+    },
+    exportFile: function () {
+      appConstants.diceStorage.fetch().then(function (dice) {
+        const diceBlob = new Blob([JSON.stringify(dice)], { type: 'application/json;charset=utf-8' })
+        saveAs(diceBlob, 'yourDice.json')
+      })
     },
 
     /*
@@ -141,6 +179,10 @@ export default {
   created: async function () {
     appConstants.diceStorage.fetch().then(function (diceObject) {
       this.dice = diceObject
+    }.bind(this))
+
+    appConstants.ideaStorage.fetch().then(function (ideas) {
+      this.savedIdeas = ideas
     }.bind(this))
   }
 }

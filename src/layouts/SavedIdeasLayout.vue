@@ -7,8 +7,8 @@
     <div v-else class="previous-ideas-container">
       <h1>Your saved idea sets</h1>
       <p>Here is where your idea sets are saved in case you found some interesting insights on an idea and you don't want to lose it.</p>
-      <div class="idea-container" v-for="idea in savedIdeas" :key="idea.key">
-        <div class="idea-set-name" :class="{ renaming: isIdeaSetEqual(idea)}">
+      <div class="idea-container" v-for="idea in savedIdeas" :key="idea.id">
+        <div class="idea-set-name" :class="{ renaming: isIdeaSetEqual(idea) }">
           <div v-text="idea.name" class="idea-set-label" @click="$emit('edit-idea-set-name', idea)"></div>
           <input
           class="idea-set-label-edit"
@@ -36,11 +36,17 @@ import * as _ from 'lodash'
 import * as appConstants from '../appConstants'
 
 export default {
-  name: 'PreviousIdeasLayout',
+  name: 'SavedIdeasLayout',
   props: {
     savedIdeas: {
       type: Array,
       required: true
+    },
+    editingIdeaSet: {
+      type: Object
+    },
+    state: {
+      type: String
     }
   },
   components: {
@@ -83,18 +89,26 @@ export default {
   }
 }
 
-.idea-set-label-edit {@apply hidden w-4/5;}
+.idea-set-label, .idea-set-label-edit {@apply p-2 min-h-8;}
+
+.idea-set-label {
+  @apply cursor-pointer w-3/4;
+
+  &:hover {@apply bg-grey-lighter;}
+}
+
+.idea-set-label-edit {@apply hidden w-4/5 p-1;}
 
 .previous-idea {
   @apply flex flex-row flex-wrap items-center mt-8 mb-6 list-reset break-words justify-around;
 }
 
 .idea-shard {
-  @apply bg-grey w-full p-4 m-3 cursor-pointer;
+  @apply bg-grey w-full p-4 m-3 cursor-pointer break-words;
   &:hover {@apply bg-grey-lighter;}
 
-  @screen md {
-    @apply w-1/5;
-  }
+  @screen sm {@apply w-1/4;}
+
+  @screen md {@apply w-1/5;}
 }
 </style>
