@@ -116,7 +116,11 @@ export default {
       for (const file of files) {
         const fileReader = new FileReader()
         fileReader.addEventListener('loadend', function (event) {
-          this.dice = JSON.parse(event.target.result)
+          const diceData = JSON.parse(event.target.result)
+
+          if (typeof diceData === 'object' && diceData instanceof Array) {
+            this.dice = diceData
+          }
         }.bind(this))
         fileReader.readAsText(file)
       }

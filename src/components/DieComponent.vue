@@ -39,7 +39,7 @@
     <button v-tooltip="'Remove die'" class="die-action-button remove-die" @click.left="$emit('remove-die', die)">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.954 21.03l-9.184-9.095 9.092-9.174-2.832-2.807-9.09 9.179-9.176-9.088-2.81 2.81 9.186 9.105-9.095 9.184 2.81 2.81 9.112-9.192 9.18 9.1z"/></svg>
     </button>
-    <button v-tooltip="'Disable die'" class="die-action-button disable-die" @click.left="$emit('disable-die', die)">
+    <button v-tooltip="(die.enabled) ? 'Disable die' : 'Enable die'" class="die-action-button disable-die" @click.left="$emit('disable-die', die)">
       <svg v-if="die.enabled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>
       <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-4v14h18v-14h-12z"/></svg>
     </button>
