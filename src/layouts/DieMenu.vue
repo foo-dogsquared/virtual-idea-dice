@@ -6,21 +6,33 @@
   @keyup.self.ctrl.shift.73.exact.prevent="importFile"
   >
     <div class="dice">
-      <DieComponent v-for="die in dice"
-        :key="die.id"
-        :die="die"
-        :editingDie="editingDie"
-        :editingDieItem="editingDieItem"
-        :state="state"
-        :draggableOptions="dieDragOptions"
-        @die-item-context="$refs.dieItemContextMenu.open($event, $event)"
-        @edit-die-name="editDieName"
-        @edit-die-item="editDieItem"
-        @done-edit-die-item="doneEditDieItem"
-        @remove-die="removeDie"
-        @disable-die="disableDie"
+      <Carousel :perPage="1"
+      :centerMode="true"
+      :paginationColor="colors['brand-color-light']"
+      :paginationActiveColor="colors['brand-color-dark']"
+      paginationPosition="bottom"
+      :mouseDrag="true"
+      :paginationSize="20"
+      :minSwipeDistance="100"
       >
-      </DieComponent>
+        <Slide v-for="die in dice"
+        :key="die.id">
+          <DieComponent
+            :die="die"
+            :editingDie="editingDie"
+            :editingDieItem="editingDieItem"
+            :state="state"
+            :draggableOptions="dieDragOptions"
+            @die-item-context="$refs.dieItemContextMenu.open($event, $event)"
+            @edit-die-name="editDieName"
+            @edit-die-item="editDieItem"
+            @done-edit-die-item="doneEditDieItem"
+            @remove-die="removeDie"
+            @disable-die="disableDie"
+          >
+          </DieComponent>
+        </Slide>
+      </Carousel>
     </div>
     <GenerateIdeaLayout
     :dice="dice"
@@ -45,12 +57,16 @@ import components from '../components'
 import * as appConstants from '../appConstants'
 import GenerateIdeaLayout from './GenerateIdeaLayout.vue'
 import { saveAs } from 'file-saver'
+import { Carousel, Slide } from 'vue-carousel'
+import { colors } from '../../tailwind.config'
 
 export default {
   name: 'DieMenu',
   components: {
     DieComponent: components.DieComponent,
-    GenerateIdeaLayout: GenerateIdeaLayout
+    GenerateIdeaLayout: GenerateIdeaLayout,
+    Carousel: Carousel,
+    Slide: Slide
   },
   data: function () {
     return {
@@ -178,6 +194,9 @@ export default {
         animation: 500,
         group: 'die-items'
       }
+    },
+    colors: function () {
+      return colors
     }
   },
   created: async function () {
