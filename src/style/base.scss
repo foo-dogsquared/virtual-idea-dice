@@ -5,16 +5,19 @@ html {
 }
 
 button {
-  @apply flex items-center justify-center cursor-pointer bg-grey;
-  @apply bg-transparent rounded-full border-2 border-grey;
+  @apply flex items-center justify-center cursor-pointer bg-brand-color-1 text-white rounded-full border-2 border-brand-color-1;
   
-  &.disabled {@apply bg-grey text-grey-lighter cursor-not-allowed;}
-  &:hover {@apply bg-grey-darker text-white;}
+  &.disabled {
+    @apply bg-transparent text-brand-color-1 cursor-not-allowed;
+    &:hover {@apply bg-transparent border-brand-color-light text-brand-color-light;}
+  }
+
+  &:hover {@apply bg-brand-color-dark border-brand-color-dark text-white;}
 }
 
 a {@apply text-white;}
 
 blockquote {@apply pl-8 pr-4 pt-4 pb-4 ml-8 mb-4 mt-4 bg-grey-lighter border-grey border-l-4 italic;}
 
-header, footer {@apply w-full bg-grey-dark p-4 mx-auto text-white;}
+header, footer {@apply w-full bg-brand-color-1 p-4 mx-auto text-white;}
 

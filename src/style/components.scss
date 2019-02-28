@@ -15,8 +15,8 @@
     h1 {@apply leading-normal;}
 
     a {
-      @apply text-black border-black border-2 border-dashed p-1 bg-grey-light cursor-pointer;
-      &:hover {@apply bg-grey;}
+      @apply text-brand-color-dark border-brand-color-dark border-2 p-1 bg-brand-color-light cursor-pointer;
+      &:hover {@apply bg-brand-color-dark text-white border-brand-color-light;}
     }
   }
 }
