@@ -1,6 +1,10 @@
+/* eslint-disable */
 let defaultConfig = require('tailwindcss/defaultConfig')()
 
 let colors = {
+  'brand-color-1': '#17a398',
+  'brand-color-dark': '#086375',
+  'brand-color-light': '#bfd7ea',
   'transparent': 'transparent',
 
   'black': '#22292f',
