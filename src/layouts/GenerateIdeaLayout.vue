@@ -28,7 +28,7 @@
     </div>
 
     <!-- Idea set result -->
-    <Draggable class="idea-result" :options="ideaDragOptions" :class="{ hidden: ideas.length <= 0 }">
+    <Draggable :noTransitionOnDrag="true" class="idea-result" :options="ideaDragOptions" :class="{ hidden: ideas.length <= 0 }">
       <span v-for="idea in ideas" :key="idea.id" v-text="idea.name" class="idea"></span>
     </Draggable>
 
@@ -133,12 +133,11 @@ export default {
 .die-combinations-stats {@apply text-center;}
 
 .idea-result {
-  @apply bg-grey flex flex-row flex-wrap items-center justify-center mt-4 mb-4 p-3;
-
+  @apply bg-brand-color-dark flex flex-row flex-wrap items-center justify-center mt-4 mb-4 p-3;
 }
 
 .idea {
-  @apply w-full m-3 p-3 border-dashed border-grey bg-grey-light cursor-pointer break-words;
+  @apply w-full m-3 p-3 border-dashed border-grey bg-brand-color-light cursor-pointer break-words;
   @screen md {
     @apply w-1/4;
   }

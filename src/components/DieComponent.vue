@@ -10,7 +10,7 @@
       @keyup.esc="$emit('done-edit-die-item')"
       >
     </div>
-    <Draggable class="die-items" v-model="die.items" :options="draggableOptions">
+    <div class="die-items">
       <div v-for="item in die.items"
       :key="item.id"
       class="die-item-name"
@@ -35,7 +35,7 @@
       <button class="add-die-item" @click.left="addDieItem()">
         Add item
       </button>
-    </Draggable>
+    </div>
     <button v-tooltip="'Remove die'" class="die-action-button remove-die" @click.left="$emit('remove-die', die)">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.954 21.03l-9.184-9.095 9.092-9.174-2.832-2.807-9.09 9.179-9.176-9.088-2.81 2.81 9.186 9.105-9.095 9.184 2.81 2.81 9.112-9.192 9.18 9.1z"/></svg>
     </button>
@@ -49,7 +49,6 @@
 <script>
 import * as _ from 'lodash'
 import * as appConstants from '../appConstants'
-import * as Draggable from 'vuedraggable'
 import { VTooltip } from 'v-tooltip'
 
 export default {
@@ -103,9 +102,6 @@ export default {
       if (binding.value) { el.focus() }
     },
     'tooltip': VTooltip
-  },
-  components: {
-    Draggable
   }
 }
 </script>
@@ -117,7 +113,7 @@ input[type="email"], input[type="url"] {
 }
 
 .die {
-  @apply relative mx-auto min-h-48 w-full p-2 mt-2 mb-2 border-grey border-2 border-solid rounded flex flex-col items-center justify-center;
+  @apply relative min-h-full mx-auto min-h-48 w-full p-2 mt-2 mb-2 border-brand-color-dark border-2 border-solid rounded flex flex-col items-center justify-center;
   @screen md {@apply flex-row min-h-24;}
 
   &.renaming {
@@ -126,7 +122,15 @@ input[type="email"], input[type="url"] {
   }
 
   &.disabled {
-    @apply bg-grey-light shadow-lg;
+    @apply bg-grey-light border-grey-dark text-grey-dark shadow-lg;
+
+    button {@apply bg-grey-light text-grey-dark border-grey-dark;}
+
+    button.die-action-button {@apply bg-grey-darker;}
+
+    & .die-items {@apply border-grey-dark border-l-2;}
+
+    & .die-item-name {@apply border-grey-dark border-b-2;}
 
     & .die-name {&:hover {@apply bg-grey-lighter;}}
 
@@ -167,7 +171,7 @@ input[type="email"], input[type="url"] {
   }
 
   @screen md {
-    @apply w-2/3 text-left border-grey border-l-2;
+    @apply w-2/3 text-left border-brand-color-dark border-l-2;
   }
 
   @screen sm {& > * {@apply w-1/3;}}
@@ -176,7 +180,7 @@ input[type="email"], input[type="url"] {
 .die-item-name {
   @apply w-full m-2 flex justify-center items-end;
   @screen sm {@apply w-1/3;}
-  @screen md {@apply border-grey border-b-2;}
+  @screen md {@apply border-brand-color-dark border-b-2;}
 }
 
 .die-item-actions {
@@ -202,8 +206,8 @@ input[type="email"], input[type="url"] {
 .add-die-item {@apply p-1;}
 
 .die-action-button {
-  @apply rounded-none bg-grey;
-  &:hover {@apply bg-grey-dark;}
+  @apply rounded-none border-none bg-brand-color-1 fill-current text-white;
+  &:hover {@apply bg-brand-color-dark;}
 
   &.remove-die {@apply absolute h-8 w-8 pin-t pin-r;}
   &.disable-die {@apply absolute h-8 w-8 pin-r; top: 2.25rem;}
