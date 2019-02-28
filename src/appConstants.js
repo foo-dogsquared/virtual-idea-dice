@@ -30,7 +30,8 @@ export const appHighlights = [
     description: [
       `This app is inspired from <a href="https://www.youtube.com/watch?v=NBdVpiWUKhU" target="_blank">Atomic Shrimp's Invention Dice</a>.`,
       `In this case, I made the app to be fully customizable for the user in order to explore with their own set of attributes that they've put together.`
-    ]
+    ],
+    img: 'app'
   },
   {
     header: 'Create your own set of dice',
@@ -38,27 +39,31 @@ export const appHighlights = [
       "It's like Lego but with dice. Want to create your idea dice set for games? Why not!",
       "What about food? Places? Programs? Hobbies? Or anything? That's your stuff to make!",
       'The only limit here is your imagination (and your categorizing skills).'
-    ]
+    ],
+    img: 'create'
   },
   {
     header: 'Share your idea dice set',
     description: [
       `It's possible to share your virtual idea dice set (or VIDS as I like to call them) with others through exporting and importing of your VIDS.`
-    ]
+    ],
+    img: 'share'
   },
   {
     header: 'Almost like a native mobile app',
     description: [
       `It's built with mobile-first approach so it can feel like a native mobile app (and skip the developer fees for me) which you can do by adding the app to the home screen.`,
-      `Also it works offline once you visited this app. Go on and give it a try.`
-    ]
+      `Also it works entirely offline once you visited this app (which you have already done 😁). Go on and give it a try.`
+    ],
+    img: 'phone'
   },
   {
     header: "It's free (and open source) real software",
     description: [
       `Its code is free and open to everyone which you can view it right <a href=${appConfig.repo} target="_blank">here</a>.`,
       `Which means you can help improve this project whether by suggestions, criticisms, or code.`
-    ]
+    ],
+    img: 'free'
   }
 ]
 
