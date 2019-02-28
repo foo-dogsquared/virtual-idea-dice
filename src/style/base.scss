@@ -8,7 +8,7 @@ button {
   @apply flex items-center justify-center cursor-pointer bg-brand-color-1 text-white rounded-full border-2 border-brand-color-1;
   
   &.disabled {
-    @apply bg-transparent text-brand-color-1 cursor-not-allowed;
+    @apply bg-transparent text-brand-color-light border-brand-color-light cursor-not-allowed;
     &:hover {@apply bg-transparent border-brand-color-light text-brand-color-light;}
   }
 
