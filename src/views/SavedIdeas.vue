@@ -13,7 +13,7 @@
 
 <script>
 import layouts from '../layouts'
-import * as appConstants from '../appConstants'
+import * as appConstants from '../constants'
 
 export default {
   name: 'Ideas',

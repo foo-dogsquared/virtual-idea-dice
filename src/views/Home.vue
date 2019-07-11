@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import * as appConstants from '../appConstants'
+import * as appConstants from '../constants'
 import component from '../components'
 
 export default {
