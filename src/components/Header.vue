@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import * as appConstants from '../appConstants'
+import * as appConstants from '../constants'
 
 export default {
   name: 'Header',

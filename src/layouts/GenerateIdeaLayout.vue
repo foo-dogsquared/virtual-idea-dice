@@ -43,7 +43,7 @@
 
 <script>
 import * as Draggable from 'vuedraggable'
-import * as appConstants from '../appConstants'
+import * as appConstants from '../constants'
 
 export default {
   name: 'GenerateIdeaLayout',
@@ -137,12 +137,12 @@ export default {
 }
 
 .idea {
-  @apply w-full m-3 p-3 border-dashed border-grey bg-brand-color-light cursor-pointer break-words;
+  @apply w-full m-3 p-3 border-dashed border-gray-700 bg-brand-color-light cursor-pointer break-words;
   @screen md {
     @apply w-1/4;
   }
 
-  &:hover {@apply bg-grey-lightest;}
+  &:hover {@apply bg-gray-300;}
 }
 
 .save-idea-layout {
@@ -151,5 +151,5 @@ export default {
 
 .save-idea {@apply p-4;}
 
-.delete-idea {@apply absolute border-none rounded-none w-10 h-10 pin-t pin-r;}
+.delete-idea {@apply absolute border-none rounded-none w-10 h-10 top-0 right-0;}
 </style>

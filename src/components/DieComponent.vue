@@ -16,21 +16,19 @@
       class="die-item-name"
       :class="{ editing: isDieItemEqual(die, item) }">
         <label class="die-item-label" v-text="item.name" @click="$emit('edit-die-item', {die, item})" @dblclick="removeDieItem(item)"></label>
-        <div class="die-item-actions">
-          <div class="die-item-actions-flex">
-            <input class="item-edit"
-            @keyup.esc.exact="$emit('done-edit-die-item')"
-            @keyup.enter.exact="$emit('done-edit-die-item')"
-            @keyup.shift.delete.exact="removeDieItem(item)"
-            v-model="item.name"
-            v-edit-item-focus="isDieItemEqual(die, item)"
-            type="text"
-            >
-            <button class="die-action-button remove-die-item" @click="removeDieItem(item)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 10h24v4h-24z"/></svg>
-            </button>
-          </div>
-        </div>
+        <input class="item-edit"
+        v-show="isDieItemEqual(die, item)"
+        @keydown.esc.exact="$emit('done-edit-die-item')"
+        @keydown.enter.exact="$emit('done-edit-die-item')"
+        @blur="$emit('done-edit-die-item')"
+        @keydown.shift.delete.exact="removeDieItem(item)"
+        v-model="item.name"
+        v-edit-item-focus="isDieItemEqual(die, item)"
+        type="text"
+        >
+        <button class="die-action-button remove-die-item" @click="removeDieItem(item)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 10h24v4h-24z"/></svg>
+        </button>
       </div>
       <button class="add-die-item" @click.left="addDieItem()">
         Add item
@@ -48,7 +46,7 @@
 
 <script>
 import * as _ from 'lodash'
-import * as appConstants from '../appConstants'
+import * as appConstants from '../constants'
 import { VTooltip } from 'v-tooltip'
 
 export default {
@@ -79,14 +77,18 @@ export default {
       return this.state === appConstants.state.itemEditing && (this.editingDie !== null && this.editingDieItem !== null) && (_.isEqual(die, this.editingDie) && _.isEqual(dieItem, this.editingDieItem))
     },
     addDieItem: function () {
-      const newDieItemId = appConstants.generateId()
-      const newDieItem = new appConstants.DieItem(`${this.die.name}-${newDieItemId}`, newDieItemId)
-      this.die.items.push(newDieItem)
-      this.$emit('edit-die-item', { die: this.die, item: newDieItem })
+      if (this.die.enabled) {
+        const newDieItemId = appConstants.generateId()
+        const newDieItem = new appConstants.DieItem(`${this.die.name}-${newDieItemId}`, newDieItemId)
+        this.die.items.push(newDieItem)
+        this.$emit('edit-die-item', { die: this.die, item: newDieItem })
+      }
     },
     removeDieItem: function (item) {
-      const itemIndex = this.die.items.indexOf(item)
-      this.die.items.splice(itemIndex, 1)
+      if (this.die.enabled) {
+        const itemIndex = this.die.items.indexOf(item)
+        this.die.items.splice(itemIndex, 1)
+      }
     },
     // for drag events
     onMove: function ({ relatedContext, draggedContext }) {
@@ -109,7 +111,7 @@ export default {
 <style lang="scss">
 input[type="text"], input[type="password"],
 input[type="email"], input[type="url"] {
-  @apply bg-grey-light;
+  @apply bg-gray-300;
 }
 
 .die {
@@ -122,32 +124,31 @@ input[type="email"], input[type="url"] {
   }
 
   &.disabled {
-    @apply bg-grey-light border-grey-dark text-grey-dark shadow-lg;
+    @apply bg-gray-300 border-gray-700 text-gray-600 shadow-lg cursor-not-allowed;
 
-    button {@apply bg-grey-light text-grey-dark border-grey-dark;}
+    button {@apply bg-gray-300 text-gray-600 border-gray-700;}
 
-    button.die-action-button {@apply bg-grey-darker;}
+    button.die-action-button {@apply bg-gray-600 text-gray-300;}
 
-    & .die-items {@apply border-grey-dark border-l-2;}
+    & .die-items {@apply border-gray-700 border-l-2;}
 
-    & .die-item-name {@apply border-grey-dark border-b-2;}
+    & .die-item-name {@apply border-gray-700 border-b-2;}
 
-    & .die-name {&:hover {@apply bg-grey-lighter;}}
+    & .die-name {&:hover {@apply bg-gray-300;}}
 
-    & .die-item-label {&:hover {@apply bg-grey-lighter;}}
+    & .die-item-label {&:hover {@apply bg-gray-300;}}
   }
 }
 
 .die-type {
   @apply w-full;
-  @screen md {
-    @apply w-1/3 text-left h-full;
-  }
+  @screen md {@apply w-1/3 text-left h-full;}
+  @screen xs {@apply mb-4;}
 }
 
 .die-name {
   @apply cursor-pointer w-4/5;
-  &:hover {@apply bg-grey-light;}
+  &:hover {@apply bg-gray-300;}
 
   @screen md {@apply w-full;}
 }
@@ -178,38 +179,34 @@ input[type="email"], input[type="url"] {
 }
 
 .die-item-name {
-  @apply w-full m-2 flex justify-center items-end;
+  @apply   m-2 flex justify-center items-end;
   @screen sm {@apply w-1/3;}
   @screen md {@apply border-brand-color-dark border-b-2;}
+
+  & .item-edit {@apply h-full w-3/4;}
+  & .remove-die-item {@apply w-1/4 h-full;}
 }
 
-.die-item-actions {
-  @apply hidden w-full;
-
-  & .item-edit {@apply w-3/4 p-2;}
-  & .remove-die-item {@apply w-1/4;}
-}
-
-.die-item-label, .item-edit {@apply min-h-8 p-2;}
+.die-item-label, .item-edit {@apply w-3/4 min-h-8 p-2;}
 
 .die-item-actions-flex {@apply flex flex-row;}
 
 .die-item-label {
-  @apply cursor-pointer block p-1 w-full break-words;
+  @apply cursor-pointer block p-1 w-3/4 break-words;
 
   &:hover {
-    @apply bg-grey-light;
+    @apply bg-gray-300;
     transition: .2s;
   }
 }
 
-.add-die-item {@apply p-1;}
+.add-die-item {@apply p-1 max-h-1/2 my-auto;}
 
 .die-action-button {
   @apply rounded-none border-none bg-brand-color-1 fill-current text-white;
   &:hover {@apply bg-brand-color-dark;}
 
-  &.remove-die {@apply absolute h-8 w-8 pin-t pin-r;}
-  &.disable-die {@apply absolute h-8 w-8 pin-r; top: 2.25rem;}
+  &.remove-die {@apply absolute h-8 w-8 top-0 right-0;}
+  &.disable-die {@apply absolute h-8 w-8 right-0; top: 2.25rem;}
 }
 </style>

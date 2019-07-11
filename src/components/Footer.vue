@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import * as appConstants from '../appConstants'
+import * as appConstants from '../constants'
 
 export default {
   name: 'Footer',
@@ -31,12 +31,13 @@ export default {
 
 <style lang="scss">
 .social-icons {
+  @apply flex flex-row;
   & > * {@apply ml-3 mr-3;}
 }
 
 .icon {
   @apply fill-current stroke-current text-white w-8 h-8;
 
-  &:hover {@apply text-grey;}
+  &:hover {@apply text-gray-600;}
 }
 </style>

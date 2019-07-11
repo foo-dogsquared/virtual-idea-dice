@@ -33,7 +33,7 @@
 <script>
 import * as Draggable from 'vuedraggable'
 import * as _ from 'lodash'
-import * as appConstants from '../appConstants'
+import * as appConstants from '../constants'
 // import { Carousel, Slide } from 'vue-carousel'
 import { VTooltip } from 'v-tooltip'
 import { colors } from '../../tailwind.config'
@@ -114,7 +114,7 @@ export default {
 .idea-set-label-edit {@apply hidden bg-brand-color-1 text-white w-4/5;}
 
 .previous-idea {
-  @apply flex flex-row flex-wrap items-center mt-8 mb-6 list-reset break-words justify-around;
+  @apply flex flex-row flex-wrap items-center mt-8 mb-6  break-words justify-around;
 }
 
 .idea-shard {
