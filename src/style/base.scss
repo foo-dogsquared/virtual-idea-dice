@@ -17,7 +17,10 @@ button {
 
 a {@apply text-white;}
 
-blockquote {@apply pl-8 pr-4 pt-4 pb-4 ml-8 mb-4 mt-4 bg-grey-lighter border-grey border-l-4 italic;}
+blockquote {@apply pl-8 pr-4 pt-4 pb-4 ml-8 mb-4 mt-4 bg-gray-300 border-gray-700 border-l-4 italic;}
 
 header, footer {@apply w-full bg-brand-color-1 p-4 mx-auto text-white;}
 
+// headings
+h1 {@apply text-2xl font-black;}
+h2 {@apply text-xl font-extrabold;}
