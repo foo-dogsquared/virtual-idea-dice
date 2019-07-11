@@ -1,5 +1,5 @@
 .wrapper {
-  @apply max-w-lg m-auto;
+  @apply max-w-3xl m-auto;
 
   &.header, &.footer {
     @apply flex flex-col items-center;
