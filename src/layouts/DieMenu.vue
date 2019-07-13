@@ -6,24 +6,15 @@
       :paginationColor="colors['brand-color-light']"
       :paginationActiveColor="colors['brand-color-dark']"
       paginationPosition="bottom"
-      :mouseDrag="true"
       :paginationSize="20"
-      :minSwipeDistance="150"
+      @page-change="setCurrentPage"
       >
         <Slide v-for="die in dice"
         :key="die.id">
           <DieComponent
             :die="die"
-            :editingDie="editingDie"
-            :editingDieItem="editingDieItem"
-            :state="state"
             :draggableOptions="dieDragOptions"
-            @die-item-context="$refs.dieItemContextMenu.open($event, $event)"
-            @edit-die-name="editDieName"
-            @edit-die-item="editDieItem"
-            @done-edit-die-item="doneEditDieItem"
             @remove-die="removeDie"
-            @disable-die="disableDie"
           >
           </DieComponent>
         </Slide>
@@ -32,7 +23,7 @@
     <GenerateIdeaLayout
     :dice="dice"
     :isIdeaSaved="isIdeaSaved"
-    :ideas="ideas"
+    :results="ideas"
     @add-die="addDie"
     @generate-idea="generateItems"
     @clear-idea="clearGeneratedIdea"
@@ -53,7 +44,6 @@ import * as appConstants from '../constants'
 import GenerateIdeaLayout from './GenerateIdeaLayout.vue'
 import { saveAs } from 'file-saver'
 import { Carousel, Slide } from 'vue-carousel'
-import { theme } from '../../tailwind.config'
 
 export default {
   name: 'DieMenu',
@@ -73,7 +63,8 @@ export default {
       savedIdeas: [],
       isIdeaSaved: false,
       dieStack: [],
-      showHelp: false
+      showHelp: false,
+      currentPage: 0
     }
   },
   methods: {
@@ -108,11 +99,19 @@ export default {
      *
      * @param die - an instance of the Die object; if no instance has passed it'll create a new one
      */
-    addDie: function (die = undefined) {
-      if (die && die instanceof appConstants.Die) {
-        this.dice.push(die)
+    addDie: function (die = undefined, index = undefined) {
+      let _index = null
+
+      if (typeof index === 'number' && index >= 0) {
+        _index = index
       } else {
-        this.dice.push(new appConstants.Die())
+        _index = this.dice.length
+      }
+
+      if (die && die instanceof appConstants.Die) {
+        this.dice.splice(_index, 0, die)
+      } else {
+        this.dice.splice(_index, 0, new appConstants.Die())
       }
     },
 
@@ -121,13 +120,26 @@ export default {
     *                       and pass it to the removed die stack
     *
     * @param dieObject - the die to be removed
+    *                    or a number representing the position from the
+    *                    dice carousel/menu
     **/
     removeDie: function (dieObject) {
-      if (this.dieStack.length > 20) {
-        this.dieStack.shift()
+      const _dieObject = {}
+      if (dieObject instanceof appConstants.Die) {
+        _dieObject['index'] = this.dice.indexOf(dieObject)
+        _dieObject['die'] = this.dice.splice(_dieObject['index'], 1)[0]
+      } else if (typeof dieObject === 'number') {
+        _dieObject['index'] = dieObject
+        _dieObject['die'] = this.dice.splice(dieObject, 1)[0]
       }
 
-      this.dieStack.push(this.dice.splice(this.dice.indexOf(dieObject), 1)[0])
+      if (!_dieObject) { return }
+
+      if (this.dieStack.length > 20) {
+        this.dieStack.shift(_dieObject)
+      }
+
+      this.dieStack.push(_dieObject)
     },
 
     /**
@@ -136,17 +148,9 @@ export default {
      */
     undoRemoveDie: function () {
       const mostRecentDie = this.dieStack.pop()
-      if (mostRecentDie && mostRecentDie instanceof appConstants.Die) this.addDie(mostRecentDie)
-    },
-
-    /**
-     * @function disableDie - disables the die; when the die is disabled, it doesn't
-     *                        included into any of the counting/evaluation processes
-     *                        (i.e. counting of total combinations, generating ideas)
-     */
-    disableDie: function (dieObject) {
-      const dieIndex = this.dice.indexOf(dieObject)
-      this.dice[dieIndex].enabled = !this.dice[dieIndex].enabled
+      if (mostRecentDie && mostRecentDie['die'] instanceof appConstants.Die) {
+        this.addDie(mostRecentDie['die'], mostRecentDie['index'])
+      }
     },
 
     /**
@@ -156,6 +160,14 @@ export default {
      */
     setSampleSet: function () {
       this.dice = appConstants.atomicShrimpSampleDiceSet
+    },
+
+    /**
+     * @function setCurrentPage - sets the currentPage emitted from the carousel;
+     *                            this is mainly for managing dice with keyboard shortcuts
+     */
+    setCurrentPage: function (pageNumber) {
+      this.currentPage = pageNumber
     },
 
     /*
@@ -200,10 +212,16 @@ export default {
 
       this.isIdeaSaved = false
       const ideasArray = []
+
       this.dice.map(function (die) {
         if (die.items.length === 0) return
         if (!die.enabled) return
-        ideasArray.push(die.items[Math.floor(Math.random() * die.items.length)])
+
+        const dieResult = die.items[Math.floor(Math.random() * die.items.length)]
+
+        const ideaShard = new appConstants.IdeaShard(dieResult, die)
+
+        ideasArray.push(ideaShard)
       })
 
       this.ideas = ideasArray
@@ -212,10 +230,9 @@ export default {
       this.ideas = []
     },
     addIdea: function () {
-      if (this.ideas.length < 2) return
+      if (this.ideas.shards.length < 2) return
 
-      const newIdeaSetId = appConstants.generateId()
-      this.savedIdeas.push({ 'id': newIdeaSetId, 'shards': this.ideas, 'name': `Idea Set #${newIdeaSetId}` })
+      this.savedIdeas.push(this.ideas)
       this.isIdeaSaved = true
     }
   },
@@ -242,7 +259,7 @@ export default {
       }
     },
     colors: function () {
-      return theme.extend.colors
+      return appConstants.colors
     }
   },
   created: async function () {
@@ -270,9 +287,9 @@ export default {
         } else if (event.shiftKey && (event.key === 'I' || event.key === 'i')) {
           event.preventDefault()
           this.openFilePrompt()
-        } else if (event.key === 'Delete' || (event.key === 'D' || event.key === ('d'))) {
+        } else if (event.key === 'D' || event.key === 'd') {
           event.preventDefault()
-          this.clearGeneratedIdea()
+          this.removeDie(this.currentPage)
         } else if (event.key === 'Z' || event.key === 'z') {
           event.preventDefault()
           this.undoRemoveDie()
@@ -284,6 +301,15 @@ export default {
         if (event.key === 'N' || event.key === 'n') {
           event.preventDefault()
           this.addDie()
+        }
+      }
+
+      // prevents entering a newline in any of the input since it is
+      // not allowed (I mean, it doesn't make sense to have a name with a
+      // newline)
+      if (event.target.tagName === 'TEXTAREA') {
+        if (event.key === 'Enter') {
+          event.target.blur()
         }
       }
     }
