@@ -26,10 +26,23 @@ them to see it. Be sure to export your dice set first since the app can only hav
 If you want to open this app locally on your machine, just do the following:
 
 * clone this repo or download the zip of this repo provided
+* fetch from the files from the dev (`develop`) branch
 * install all of the dependencies needed (`npm i`)
 * open the app over `localhost` with `npm run serve`
 
-Voila! It's open now! 😁
+If you want to contribute through code, you can look at the link:docs/CHANGELOG.adoc[changelog] 
+in the dev (`develop`) branch for the latest features that has been implemented so far. 
+Also, it contains some future features that is to be considered.
+
+If you want to contribute through writing and/or improving documentations, have a quick look at 
+https://asciidoctor.org/[Asciidoctor] since it is the formatting language used for writing docs 
+around here. It's basically a (more comprehensive) alternative to Markdown. 
+
+Speaking of Markdown, you can take a good look 
+https://asciidoctor.org/docs/user-manual/#compared-to-markdown[here] if you're familiar with 
+Markdown for a quick start.
+
+Aaaaaaaand voila! It's open now! 😁
 
 If you want to contribute or just add features that you want, take note of the following configurations:
 
@@ -54,4 +67,9 @@ Also, for future references:
 * Multiple virtual idea dice set (VIDS) support
 
 * A VIDS ranking system (see https://github.com/foo-dogsquared/virtual-idea-dice/issues/7[this issue])
--- This is mostly be implemented as an optional feature since the app is built to be offline.
+-- This is mostly be implemented as an optional feature since the app is built to be offline and this 
+mostly requires the user to be online. Though with online capability, it is yet to be one of 
+the biggest features to be implemented so far.
+
+* Improve UI/UX
+-- I especially need some help from this one. ;-;

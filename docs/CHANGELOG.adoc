@@ -19,12 +19,24 @@ deleted dice at any given time)
 ** `Ctrl + Shift + E` or `Ctrl + S` for exporting the current dice set
 ** `Ctrl + Z` for adding back the most recent deleted die
 
-* Disabling dice now prevents you from modifying anything in the die (it's not a bug, it's a feature, I swear...)
+* Disabling dice now prevents you from modifying anything in the die 
+(it's not a bug, it's a feature, I swear...).
 
 === Changed
-* Minor refactor of components code
+* Unique ID format has been revised to base 36 to produce less data while being able 
+to generate more possible combinations. It should have no effect on previously 
+generated data.
+** It also makes the newly generated items to have shorter names so it'll have less 
+hassle of growing more room in the GUI.
+
+* Minor refactor of components code.
+
+* A minor revamp of the UI and improved the UX (hopefully...).
+** A big detail that I want to point out here is how the remove die item button. Now 
+it's constantly present with the item since it produces weird quirks 
+and it just feels unnatural on the UX side.
 
 * Use of https://tailwindcss.com[Tailwind CSS] 1.0 therefore 
 https://tailwindcss.com/docs/release-notes/#tailwind-css-v1-0[big changes happened to its Tailwind config file]
 ** A minor site aesthetic change has also occured as a side effect of the major upgrade due to the new approach
-of Tailwind CSS
+of Tailwind CSS. Also, because of that, the UX has also improved.
