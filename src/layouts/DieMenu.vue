@@ -1,34 +1,20 @@
 <template>
-  <div class="die-menu"
-  @keyup.self.enter.exact="addDie"
-  @keyup.self.ctrl.71.exact.prevent="clearGeneratedIdea"
-  @keyup.self.ctrl.shift.69.exact.prevent="exportFile"
-  @keyup.self.ctrl.shift.73.exact.prevent="importFile"
-  >
+  <div class="die-menu">
     <div class="dice">
       <Carousel :perPage="1"
       :centerMode="true"
       :paginationColor="colors['brand-color-light']"
       :paginationActiveColor="colors['brand-color-dark']"
       paginationPosition="bottom"
-      :mouseDrag="true"
       :paginationSize="20"
-      :minSwipeDistance="100"
+      @page-change="setCurrentPage"
       >
         <Slide v-for="die in dice"
         :key="die.id">
           <DieComponent
             :die="die"
-            :editingDie="editingDie"
-            :editingDieItem="editingDieItem"
-            :state="state"
             :draggableOptions="dieDragOptions"
-            @die-item-context="$refs.dieItemContextMenu.open($event, $event)"
-            @edit-die-name="editDieName"
-            @edit-die-item="editDieItem"
-            @done-edit-die-item="doneEditDieItem"
             @remove-die="removeDie"
-            @disable-die="disableDie"
           >
           </DieComponent>
         </Slide>
@@ -37,7 +23,7 @@
     <GenerateIdeaLayout
     :dice="dice"
     :isIdeaSaved="isIdeaSaved"
-    :ideas="ideas"
+    :results="ideas"
     @add-die="addDie"
     @generate-idea="generateItems"
     @clear-idea="clearGeneratedIdea"
@@ -54,11 +40,10 @@
 
 <script>
 import components from '../components'
-import * as appConstants from '../appConstants'
+import * as appConstants from '../constants'
 import GenerateIdeaLayout from './GenerateIdeaLayout.vue'
 import { saveAs } from 'file-saver'
 import { Carousel, Slide } from 'vue-carousel'
-import { colors } from '../../tailwind.config'
 
 export default {
   name: 'DieMenu',
@@ -76,7 +61,10 @@ export default {
       state: null,
       ideas: [],
       savedIdeas: [],
-      isIdeaSaved: false
+      isIdeaSaved: false,
+      dieStack: [],
+      showHelp: false,
+      currentPage: 0
     }
   },
   methods: {
@@ -84,13 +72,17 @@ export default {
     * State functions
     */
     editDieName: function (die) {
-      this.editingDie = die
-      this.state = appConstants.state.dieRenaming
+      if (die.enabled) {
+        this.editingDie = die
+        this.state = appConstants.state.dieRenaming
+      }
     },
     editDieItem: function ({ die, item }) {
-      this.editingDie = die
-      this.editingDieItem = item
-      this.state = appConstants.state.itemEditing
+      if (die.enabled) {
+        this.editingDie = die
+        this.editingDieItem = item
+        this.state = appConstants.state.itemEditing
+      }
     },
     doneEditDieItem: function () {
       this.editingItem = null
@@ -101,24 +93,86 @@ export default {
     /*
     * Die-related functions
     */
-    addDie: function () {
-      const newDieId = appConstants.generateId()
-      this.dice.push(new appConstants.Die(newDieId, `NewDie${newDieId}`))
-    },
-    /**
-      @function removeDie - removes the die passed as the parameter
 
-      @param dieObject - the die to be removed
+    /**
+     * @function addDie - adds a die into the list
+     *
+     * @param die - an instance of the Die object; if no instance has passed it'll create a new one
+     */
+    addDie: function (die = undefined, index = undefined) {
+      let _index = null
+
+      if (typeof index === 'number' && index >= 0) {
+        _index = index
+      } else {
+        _index = this.dice.length
+      }
+
+      if (die && die instanceof appConstants.Die) {
+        this.dice.splice(_index, 0, die)
+      } else {
+        this.dice.splice(_index, 0, new appConstants.Die())
+      }
+    },
+
+    /**
+    * @function removeDie - removes the die passed as the parameter
+    *                       and pass it to the removed die stack
+    *
+    * @param dieObject - the die to be removed
+    *                    or a number representing the position from the
+    *                    dice carousel/menu
     **/
     removeDie: function (dieObject) {
-      this.dice.splice(this.dice.indexOf(dieObject), 1)
+      const _dieObject = {}
+      if (dieObject instanceof appConstants.Die) {
+        if (!dieObject.enabled) return
+
+        _dieObject['index'] = this.dice.indexOf(dieObject)
+        _dieObject['die'] = this.dice.splice(_dieObject['index'], 1)[0]
+      } else if (typeof dieObject === 'number') {
+        _dieObject['die'] = this.dice[dieObject]
+        if (!_dieObject['die'].enabled) return
+
+        _dieObject['index'] = dieObject
+        this.dice.splice(_dieObject['index'], 1)
+      }
+
+      if (!_dieObject) { return }
+
+      if (this.dieStack.length > 20) {
+        this.dieStack.shift(_dieObject)
+      }
+
+      this.dieStack.push(_dieObject)
     },
-    disableDie: function (dieObject) {
-      const dieIndex = this.dice.indexOf(dieObject)
-      this.dice[dieIndex].enabled = !this.dice[dieIndex].enabled
+
+    /**
+     * @function undoRemoveDie - simply gets the most recent deleted die
+     *                           and adds it back to the dice list
+     */
+    undoRemoveDie: function () {
+      const mostRecentDie = this.dieStack.pop()
+      if (mostRecentDie && mostRecentDie['die'] instanceof appConstants.Die) {
+        this.addDie(mostRecentDie['die'], mostRecentDie['index'])
+      }
     },
+
+    /**
+     * @function setSampleSet - for now, simply sets Atomic Shrimp's Invention Dice set;
+     *                          I probably make it as a basis for multiple dice set feature
+     *                          without relying on multiple JSON dice set files
+     */
     setSampleSet: function () {
       this.dice = appConstants.atomicShrimpSampleDiceSet
+    },
+
+    /**
+     * @function setCurrentPage - sets the currentPage emitted from the carousel;
+     *                            this is mainly for managing dice with keyboard shortcuts
+     */
+    setCurrentPage: function (pageNumber) {
+      this.currentPage = pageNumber
     },
 
     /*
@@ -127,6 +181,13 @@ export default {
     openFilePrompt: function () {
       document.querySelector("input[type='file']#import-file-dice-form").click()
     },
+
+    /**
+     * @function importFile - simply reads the file to be imported;
+     *                        it has no form of validation so it is vulnerable to
+     *                        malicious inputs; use of a JSON schema validation is
+     *                        considered
+     */
     importFile: function () {
       const files = document.querySelector("input[type='file']#import-file-dice-form").files
       for (const file of files) {
@@ -135,7 +196,10 @@ export default {
           const diceData = JSON.parse(event.target.result)
 
           if (typeof diceData === 'object' && diceData instanceof Array) {
-            this.dice = diceData
+            this.dice = []
+            for (const die of diceData) {
+              this.dice.push(new appConstants.Die(die))
+            }
           }
         }.bind(this))
         fileReader.readAsText(file)
@@ -156,10 +220,16 @@ export default {
 
       this.isIdeaSaved = false
       const ideasArray = []
+
       this.dice.map(function (die) {
         if (die.items.length === 0) return
         if (!die.enabled) return
-        ideasArray.push(die.items[Math.floor(Math.random() * die.items.length)])
+
+        const dieResult = die.items[Math.floor(Math.random() * die.items.length)]
+
+        const ideaShard = new appConstants.IdeaShard(dieResult, die)
+
+        ideasArray.push(ideaShard)
       })
 
       this.ideas = ideasArray
@@ -168,8 +238,13 @@ export default {
       this.ideas = []
     },
     addIdea: function () {
-      const newIdeaSetId = appConstants.generateId()
-      this.savedIdeas.push({ 'id': newIdeaSetId, 'shards': this.ideas, 'name': `Idea Set #${newIdeaSetId}` })
+      if (this.ideas.length < 2) return
+
+      const newIdeaSet = new appConstants.IdeaSet()
+      for (const idea of this.ideas) {
+        newIdeaSet.addShard(idea)
+      }
+      this.savedIdeas.push(newIdeaSet)
       this.isIdeaSaved = true
     }
   },
@@ -196,7 +271,7 @@ export default {
       }
     },
     colors: function () {
-      return colors
+      return appConstants.colors
     }
   },
   created: async function () {
@@ -207,6 +282,48 @@ export default {
     appConstants.ideaStorage.fetch().then(function (ideas) {
       this.savedIdeas = ideas
     }.bind(this))
+  },
+  mounted () {
+    // a function that holds a list of keyboard shortcuts within the app page
+    this._keyListener = function (event) {
+      if (event.ctrlKey) {
+        if (event.key === 'S' || event.key === 's') {
+          event.preventDefault()
+          this.addIdea()
+        } else if (event.key === 'E' || event.key === 'e') {
+          event.preventDefault()
+          this.exportFile()
+        } else if (event.key === 'G' || event.key === 'g' || event.key === 'Enter') {
+          event.preventDefault()
+          this.generateItems()
+        } else if (event.key === 'I' || event.key === 'i') {
+          event.preventDefault()
+          this.openFilePrompt()
+        } else if (event.key === 'D' || event.key === 'd') {
+          event.preventDefault()
+          this.clearGeneratedIdea()
+        } else if (event.key === 'Z' || event.key === 'z') {
+          event.preventDefault()
+          this.undoRemoveDie()
+        } else if (event.key === 'Delete') {
+          event.preventDefault()
+          this.removeDie(this.currentPage)
+        }
+      }
+
+      // Shift + <KEY> shortcuts
+      if (event.shiftKey) {
+        if (event.key === 'N' || event.key === 'n') {
+          event.preventDefault()
+          this.addDie()
+        }
+      }
+    }
+
+    document.addEventListener('keydown', this._keyListener.bind(this))
+  },
+  beforeDestroy () {
+    document.removeEventListener('keydown', this._keyListener)
   }
 }
 </script>

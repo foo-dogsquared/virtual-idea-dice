@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import * as appConstants from '../appConstants'
+import * as appConstants from '../constants'
 
 export default {
   name: 'Header',
@@ -29,15 +29,11 @@ export default {
 
 <style lang="scss">
 .nav-links {
-  @apply flex flex-col flex-wrap;
+  @apply flex flex-row flex-wrap justify-center;
   & > * {
     @apply mb-4 ml-4 mr-4 text-center;
 
     @screen md {@apply mb-0;}
-  }
-
-  @screen sm {
-    @apply flex-row items-center;
   }
 }
 

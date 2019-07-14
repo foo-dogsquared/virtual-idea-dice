@@ -1,0 +1,58 @@
+= Changelog
+All notable changes to this project will be documented in this file since 
+July 11 of 2019 (2019-07-11).
+
+The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
+and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
+
+== [Unreleased]
+
+== [0.2.0] - 2019-07-14
+=== Added
+* Locking function for the die in case you want to not accidentally modify the die 
+(i.e. adding/removing items, editing items) or something.
+
+* Disabling dice now prevents you from modifying anything in the die 
+(it's not a bug, it's a feature, I swear...). It basically functions as a lock 
+function except it doesn't count towards any of the app's operations as if it 
+was deleted or never existed in the first place.
+
+* Set a maximum length set for die name, die items, and idea set names. Here's the 
+following specifications:
+** For die and idea set names, *its length must be less than 64 characters*.
+** For die items, *its length must be less than 32 characters*.
+** There's no format for the required characters. You can put all of the exclamation marks, 
+emojis, and semicolons all you want.
+
+* 'Undo' function for previously deleted dice (you can only retrieve up to 20 recently 
+deleted dice at any given time). Take note that you can only hold it in the current session. 
+Changing pages or reloading will lose the deleted dice stack.
+
+* New keyboard shortcuts to the main app page
+** `Shift + N` for a new die
+** `Ctrl + G` for generating an idea set
+** `Ctrl + D` for clearing the generated output
+** `Ctrl + S` for saving the output in the idea set database
+** `Ctrl + I` for importing dice set file
+** `Ctrl + E` for exporting the current dice set
+** `Ctrl + Delete` for deleting the current die shown in the screen
+** `Ctrl + Z` for adding back the most recent deleted die
+
+=== Changed
+* Unique ID format has been revised to base 36 to produce less data while being able 
+to generate more possible combinations. It should have no effect on previously 
+generated data.
+** It also makes the newly generated items to have shorter names so it'll have less 
+hassle of growing more room in the GUI.
+
+* Minor refactor of components code.
+
+* A minor revamp of the UI and improved the UX (hopefully...).
+** A big detail that I want to point out here is how the remove die item button. Now 
+it's constantly present with the item since it produces weird quirks 
+and it just feels unnatural on the UX side.
+
+* Use of https://tailwindcss.com[Tailwind CSS] 1.0 therefore 
+https://tailwindcss.com/docs/release-notes/#tailwind-css-v1-0[big changes happened to its Tailwind config file].
+** A minor site aesthetic change has also occured as a side effect of the major upgrade due to the new approach
+of Tailwind CSS. Also, because of that, the UX has also improved.

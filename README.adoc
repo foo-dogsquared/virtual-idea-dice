@@ -1,0 +1,82 @@
+= virtual-invention-dice
+Inspired from Atomic Shrimp's invention cube. Also serves as a simpler 
+exercise for integrating PWA. 
+
+For more information about the inspiration, you can read more about it 
+in http://atomicshrimp.com/post/2014/01/20/Invention-Dice[this link]. 
+There's also a video from the creator of this idea which you can 
+see it https://www.youtube.com/watch?v=NBdVpiWUKhU[right here].
+
+== Demo
+image::./docs/assets/demo.gif[Demo of the app]
+
+== Features of the app
+* It's mostly built as an offline app so once you've visited the app, you'll be 
+ready to go. No installation required. 
+** Being a 
+https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Introduction[progressive web app (PWA)], 
+you can even make it _almost_ like a native mobile app on your phone
+by adding the app page into the home screen.
+
+* Defining your own set of virtual idea dice set (or VIDS, as I call them).
+
+* Storing VIDS in IndexedDB (with https://localforage.github.io/localForage/[localforage]).
+
+* Import and export of VIDS with a JSON file
+** You can see some sample dice sets in the link:examples/[`examples/` directory] and import 
+them to see it. Be sure to export your dice set first since the app can only have one set 
+(at least for now).
+
+* Saving dice results in IndexedDB (with https://localforage.github.io/localForage/[localforage]).
+
+== Development build
+If you want to open this app locally on your machine, just do the following:
+
+* clone this repo or download the zip of this repo provided
+* fetch from the files from the dev (`develop`) branch
+* install all of the dependencies needed (`npm i`)
+* open the app over `localhost` with `npm run serve`
+
+If you want to contribute through code, you can look at the link:docs/CHANGELOG.adoc[changelog] 
+in the dev (`develop`) branch for the latest features that has been implemented so far. 
+Also, it contains some future features that is to be considered.
+
+If you want to contribute through writing and/or improving documentations, have a quick look at 
+https://asciidoctor.org/[Asciidoctor] since it is the formatting language used for writing docs 
+around here. It's basically a (more comprehensive) alternative to Markdown. 
+
+Speaking of Markdown, you can take a good look 
+https://asciidoctor.org/docs/user-manual/#compared-to-markdown[here] if you're familiar with 
+Markdown for a quick start.
+
+Aaaaaaaand voila! It's open now! 😁
+
+If you want to contribute or just add features that you want, take note of the following configurations:
+
+* created with https://cli.vuejs.org/guide/[Vue CLI] 
+and the https://router.vuejs.org/[official Vue router library]
+
+* uses http://tailwindcss.com/[Tailwind CSS] for most of the CSS
+
+* uses https://github.com/eslint/eslint[ESLint] and it has the 
+https://github.com/standard/standard[standard style guide] as the configuration
+
+* all of the usual configurations and constants like the routes, app information, 
+and the author are located in link:src/constants.js[`./src/constants.js`], I've made it 
+so that I can update it easily in one place
+
+Also, for future references:
+
+* Node v11.3.0
+* npm 6.4.1
+
+== Todo
+* Multiple virtual idea dice set (VIDS) support
+
+* A VIDS ranking system (see https://github.com/foo-dogsquared/virtual-idea-dice/issues/7[this issue])
+-- This is mostly be implemented as an optional feature since the app is built to be offline and this 
+mostly requires the user to be online. Though with online capability, it is yet to be one of 
+the biggest features to be implemented so far.
+
+* Improve UI/UX
+-- I especially need some help from this one. ;-;

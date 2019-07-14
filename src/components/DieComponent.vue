@@ -1,92 +1,102 @@
 <template>
-  <div :class="{ renaming: isDieEqual(die), disabled: !die.enabled }" class="die">
-    <div class="die-type">
-      <div class="die-name" v-text="die.name" @click="$emit('edit-die-name', die)"></div>
-      <input class="die-name-edit" type="text"
-      v-model="die.name"
-      v-edit-die-focus="isDieEqual(die)"
-      @keyup.enter="$emit('done-edit-die-item')"
-      @blur="$emit('done-edit-die-item')"
-      @keyup.esc="$emit('done-edit-die-item')"
-      >
-    </div>
+  <div :class="{ disabled: !die.enabled }" class="die">
+    <input class="die-type" type="text"
+    ref="dieType"
+    v-model="die.name"
+    @blur="die.name = die.name.length <= 0 ? die.id : die.name.trim()"
+    :disabled="!die.checkLockOrEnabled()"
+    >
     <div class="die-items">
       <div v-for="item in die.items"
       :key="item.id"
-      class="die-item-name"
-      :class="{ editing: isDieItemEqual(die, item) }">
-        <label class="die-item-label" v-text="item.name" @click="$emit('edit-die-item', {die, item})" @dblclick="removeDieItem(item)"></label>
-        <div class="die-item-actions">
-          <div class="die-item-actions-flex">
-            <input class="item-edit"
-            @keyup.esc.exact="$emit('done-edit-die-item')"
-            @keyup.enter.exact="$emit('done-edit-die-item')"
-            @keyup.shift.delete.exact="removeDieItem(item)"
-            v-model="item.name"
-            v-edit-item-focus="isDieItemEqual(die, item)"
-            type="text"
-            >
-            <button class="die-action-button remove-die-item" @click="removeDieItem(item)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 10h24v4h-24z"/></svg>
-            </button>
-          </div>
-        </div>
+      class="die-item-name-container"
+      >
+        <label class="die-item-name"
+        v-show="!(editingItem && editingItem === item)"
+        v-text="item.name"
+        @click.left="setEditingItem(item)">
+        </label>
+
+        <input ref="dieItem" class="die-item-name"
+        v-show="editingItem === item"
+        @keydown.shift.delete.exact="die.removeDieItem(item)"
+        @blur="item.name.length === 0 ? die.removeDieItem(item) : item.trimExtraCharacters(); editingItem = null"
+        v-model="item.name"
+        :disabled="!die.checkLockOrEnabled()"
+        v-edit-item-focus="editingItem === item"
+        >
+        <button :disabled="!die.checkLockOrEnabled()" class="die-action-button remove-item-button" @click.left="die.removeDieItem(item)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 10h24v4h-24z"/></svg>
+        </button>
       </div>
-      <button class="add-die-item" @click.left="addDieItem()">
+      <button :disabled="!die.checkLockOrEnabled()" class="add-die-item" @click.left="die.addDieItem()">
         Add item
       </button>
     </div>
-    <button v-tooltip="'Remove die'" class="die-action-button remove-die" @click.left="$emit('remove-die', die)">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.954 21.03l-9.184-9.095 9.092-9.174-2.832-2.807-9.09 9.179-9.176-9.088-2.81 2.81 9.186 9.105-9.095 9.184 2.81 2.81 9.112-9.192 9.18 9.1z"/></svg>
-    </button>
-    <button v-tooltip="(die.enabled) ? 'Disable die' : 'Enable die'" class="die-action-button disable-die" @click.left="$emit('disable-die', die)">
-      <svg v-if="die.enabled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>
-      <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-4v14h18v-14h-12z"/></svg>
-    </button>
-  </div>
+
+    <Popover class="die-popover" popoverInnerClass="die-popover-content">
+      <button class="die-popover-target">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M17 10.645v-2.29c-1.17-.417-1.907-.533-2.28-1.431-.373-.9.07-1.512.6-2.625l-1.618-1.619c-1.105.525-1.723.974-2.626.6-.9-.373-1.017-1.116-1.431-2.28h-2.29c-.412 1.158-.53 1.907-1.431 2.28h-.001c-.9.374-1.51-.07-2.625-.6l-1.617 1.619c.527 1.11.973 1.724.6 2.625-.375.901-1.123 1.019-2.281 1.431v2.289c1.155.412 1.907.531 2.28 1.431.376.908-.081 1.534-.6 2.625l1.618 1.619c1.107-.525 1.724-.974 2.625-.6h.001c.9.373 1.018 1.118 1.431 2.28h2.289c.412-1.158.53-1.905 1.437-2.282h.001c.894-.372 1.501.071 2.619.602l1.618-1.619c-.525-1.107-.974-1.723-.601-2.625.374-.899 1.126-1.019 2.282-1.43zm-8.5 1.689c-1.564 0-2.833-1.269-2.833-2.834s1.269-2.834 2.833-2.834 2.833 1.269 2.833 2.834-1.269 2.834-2.833 2.834zm15.5 4.205v-1.077c-.55-.196-.897-.251-1.073-.673-.176-.424.033-.711.282-1.236l-.762-.762c-.52.248-.811.458-1.235.283-.424-.175-.479-.525-.674-1.073h-1.076c-.194.545-.25.897-.674 1.073-.424.176-.711-.033-1.235-.283l-.762.762c.248.523.458.812.282 1.236-.176.424-.528.479-1.073.673v1.077c.544.193.897.25 1.073.673.177.427-.038.722-.282 1.236l.762.762c.521-.248.812-.458 1.235-.283.424.175.479.526.674 1.073h1.076c.194-.545.25-.897.676-1.074h.001c.421-.175.706.034 1.232.284l.762-.762c-.247-.521-.458-.812-.282-1.235s.529-.481 1.073-.674zm-4 .794c-.736 0-1.333-.597-1.333-1.333s.597-1.333 1.333-1.333 1.333.597 1.333 1.333-.597 1.333-1.333 1.333zm-4 3.071v-.808c-.412-.147-.673-.188-.805-.505s.024-.533.212-.927l-.572-.571c-.389.186-.607.344-.926.212s-.359-.394-.506-.805h-.807c-.146.409-.188.673-.506.805-.317.132-.533-.024-.926-.212l-.572.571c.187.393.344.609.212.927-.132.318-.396.359-.805.505v.808c.408.145.673.188.805.505.133.32-.028.542-.212.927l.572.571c.39-.186.608-.344.926-.212.318.132.359.395.506.805h.807c.146-.409.188-.673.507-.805h.001c.315-.131.529.025.924.213l.572-.571c-.186-.391-.344-.609-.212-.927s.397-.361.805-.506zm-3 .596c-.552 0-1-.447-1-1s.448-1 1-1 1 .447 1 1-.448 1-1 1z"/></svg>
+      </button>
+
+      <template slot="popover">
+        <button :disabled="!die.checkLockOrEnabled()"
+        v-tooltip="'Remove die'"
+        class="die-action-button remove-die"
+        @click.left="$emit('remove-die', die)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.954 21.03l-9.184-9.095 9.092-9.174-2.832-2.807-9.09 9.179-9.176-9.088-2.81 2.81 9.186 9.105-9.095 9.184 2.81 2.81 9.112-9.192 9.18 9.1z"/></svg>
+        </button>
+        <button :disabled="!die.enabled" v-tooltip="(!die.locked) ? 'Lock die' : 'Unlock die'" class="die-action-button disable-die" @click.left="die.toggleLock()">
+          <svg v-if="!die.locked" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-4v14h18v-14h-12z"/></svg>
+        </button>
+        <button :disabled="die.locked" v-tooltip="(die.enabled) ? 'Disable die' : 'Enable die'" class="die-action-button disable-die" @click.left="die.toggleDisabling()">
+          <svg v-if="die.enabled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M1.341 6.502c1.11-2.157 2.877-3.984 5.162-5.16l.766 1.848c-1.779.954-3.169 2.393-4.074 4.081l-1.854-.769zm5.93 14.302c-1.688-.904-3.126-2.294-4.08-4.074l-1.848.765c1.175 2.286 3.002 4.054 5.16 5.165l.768-1.856zm-4.845-5.921c-.584-1.932-.549-3.932.005-5.765l-1.856-.768c-.739 2.311-.782 4.852.003 7.299l1.848-.766zm5.925-14.306l.766 1.848c1.932-.583 3.933-.549 5.765.005l.77-1.855c-2.313-.74-4.853-.782-7.301.002zm8.378 2.619c1.688.905 3.126 2.294 4.079 4.073l1.848-.766c-1.176-2.285-3.002-4.052-5.159-5.163l-.768 1.856zm4.845 5.919c.584 1.933.549 3.933-.005 5.766l1.855.769c.74-2.311.782-4.853-.003-7.301l-1.847.766zm-.77 7.614c-.904 1.688-2.294 3.126-4.072 4.08l.766 1.848c2.285-1.176 4.052-3.003 5.162-5.16l-1.856-.768zm-5.92 4.845c-1.933.584-3.933.549-5.766-.005l-.77 1.856c2.312.739 4.853.782 7.301-.002l-.765-1.849z"/></svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12z"/></svg>
+        </button>
+      </template>
+    </Popover>
+
+    <div class="die-status">
+      <svg v-if="die.locked" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>
+      <svg v-else-if="!die.enabled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M1.341 6.502c1.11-2.157 2.877-3.984 5.162-5.16l.766 1.848c-1.779.954-3.169 2.393-4.074 4.081l-1.854-.769zm5.93 14.302c-1.688-.904-3.126-2.294-4.08-4.074l-1.848.765c1.175 2.286 3.002 4.054 5.16 5.165l.768-1.856zm-4.845-5.921c-.584-1.932-.549-3.932.005-5.765l-1.856-.768c-.739 2.311-.782 4.852.003 7.299l1.848-.766zm5.925-14.306l.766 1.848c1.932-.583 3.933-.549 5.765.005l.77-1.855c-2.313-.74-4.853-.782-7.301.002zm8.378 2.619c1.688.905 3.126 2.294 4.079 4.073l1.848-.766c-1.176-2.285-3.002-4.052-5.159-5.163l-.768 1.856zm4.845 5.919c.584 1.933.549 3.933-.005 5.766l1.855.769c.74-2.311.782-4.853-.003-7.301l-1.847.766zm-.77 7.614c-.904 1.688-2.294 3.126-4.072 4.08l.766 1.848c2.285-1.176 4.052-3.003 5.162-5.16l-1.856-.768zm-5.92 4.845c-1.933.584-3.933.549-5.766-.005l-.77 1.856c2.312.739 4.853.782 7.301-.002l-.765-1.849z"/></svg>
+    </div>
+    </div>
 </template>
 
 <script>
-import * as _ from 'lodash'
-import * as appConstants from '../appConstants'
-import { VTooltip } from 'v-tooltip'
+import * as constants from '../constants'
+import { VTooltip, VPopover } from 'v-tooltip'
 
 export default {
   name: 'DieComponent',
+  components: {
+    Popover: VPopover
+  },
   props: {
     die: {
-      type: Object,
+      type: constants.Die,
       required: true
-    },
-    editingDie: {
-      type: Object
-    },
-    editingDieItem: {
-      type: Object
-    },
-    state: {
-      type: String
     },
     draggableOptions: {
       type: Object
     }
   },
+
+  // meant to be shared among all Die components
+  data: function () {
+    return { editingItem: null }
+  },
   methods: {
-    isDieEqual: function (die) {
-      return this.state === appConstants.state.dieRenaming && this.editingDie !== null && _.isEqual(die, this.editingDie)
+    checkForInput: function (item) {
+      if (item.length <= 0) {
+        this.die.removeDieItem(item)
+      }
     },
-    isDieItemEqual: function (die, dieItem) {
-      return this.state === appConstants.state.itemEditing && (this.editingDie !== null && this.editingDieItem !== null) && (_.isEqual(die, this.editingDie) && _.isEqual(dieItem, this.editingDieItem))
-    },
-    addDieItem: function () {
-      const newDieItemId = appConstants.generateId()
-      const newDieItem = new appConstants.DieItem(`${this.die.name}-${newDieItemId}`, newDieItemId)
-      this.die.items.push(newDieItem)
-      this.$emit('edit-die-item', { die: this.die, item: newDieItem })
-    },
-    removeDieItem: function (item) {
-      const itemIndex = this.die.items.indexOf(item)
-      this.die.items.splice(itemIndex, 1)
+    setEditingItem: function (item) {
+      if (this.die.locked || !this.die.enabled) return
+
+      this.editingItem = item
     },
     // for drag events
     onMove: function ({ relatedContext, draggedContext }) {
@@ -107,67 +117,38 @@ export default {
 </script>
 
 <style lang="scss">
-input[type="text"], input[type="password"],
-input[type="email"], input[type="url"] {
-  @apply bg-grey-light;
-}
-
 .die {
-  @apply relative min-h-full mx-auto min-h-48 w-full p-2 mt-2 mb-2 border-brand-color-dark border-2 border-solid rounded flex flex-col items-center justify-center;
+  @apply relative mx-auto min-h-48 w-full p-2 mt-2 mb-2;
+  @apply border-brand-color-dark border-2 border-solid rounded;
+  @apply flex flex-col items-center justify-center;
   @screen md {@apply flex-row min-h-24;}
 
-  &.renaming {
-    & .die-name-edit {@apply block;}
-    & .die-name {@apply hidden;}
-  }
-
   &.disabled {
-    @apply bg-grey-light border-grey-dark text-grey-dark shadow-lg;
+    @apply bg-gray-300 border-gray-700 text-gray-600 shadow-lg cursor-not-allowed;
 
-    button {@apply bg-grey-light text-grey-dark border-grey-dark;}
+    & .die-items {
+      @screen md {@apply border-gray-700 border-l-2;}
+    }
 
-    button.die-action-button {@apply bg-grey-darker;}
-
-    & .die-items {@apply border-grey-dark border-l-2;}
-
-    & .die-item-name {@apply border-grey-dark border-b-2;}
-
-    & .die-name {&:hover {@apply bg-grey-lighter;}}
-
-    & .die-item-label {&:hover {@apply bg-grey-lighter;}}
+    & .die-item-name {@apply border-gray-700;}
   }
 }
 
 .die-type {
-  @apply w-full;
-  @screen md {
-    @apply w-1/3 text-left h-full;
-  }
-}
+  @apply p-2 min-h-4 w-4/5 max-w-4/5;
+  @apply cursor-pointer resize-none;
 
-.die-name {
-  @apply cursor-pointer w-4/5;
-  &:hover {@apply bg-grey-light;}
+  &:disabled {@apply cursor-not-allowed;}
 
   @screen md {@apply w-full;}
-}
-
-.die-name, .die-name-edit {@apply p-2 min-h-8;}
-
-.die-name-edit {
-  @apply hidden w-4/5 p-2;
-  @screen md {@apply w-full;}
+  @screen md {@apply w-1/3 text-left h-full;}
+  @screen xs {@apply mb-4;}
 }
 
 .die-items {
   @apply w-full flex flex-row flex-wrap;
   & > * {
     @apply w-full m-2;
-  }
-
-  & .editing {
-    & .die-item-label {@apply hidden;}
-    & .die-item-actions {@apply block;}
   }
 
   @screen md {
@@ -177,39 +158,59 @@ input[type="email"], input[type="url"] {
   @screen sm {& > * {@apply w-1/3;}}
 }
 
-.die-item-name {
-  @apply w-full m-2 flex justify-center items-end;
-  @screen sm {@apply w-1/3;}
-  @screen md {@apply border-brand-color-dark border-b-2;}
+.die-item-name-container {
+  @apply m-2 flex justify-center items-end;
+  @screen sm { width: 42.5%; }
+
+  & .die-item-name {
+    @apply border-brand-color-dark border-b-2 rounded-l-lg;
+    @apply min-h-4 h-full max-w-4/5 w-full overflow-hidden;
+    @apply p-2;
+    @apply cursor-pointer block resize-none;
+
+    // transition: .2s;
+
+    &:hover { @apply bg-gray-300; }
+    &:focus { @apply bg-gray-400; }
+  }
+
+  & .remove-item-button {@apply rounded-r-lg;}
 }
-
-.die-item-actions {
-  @apply hidden w-full;
-
-  & .item-edit {@apply w-3/4 p-2;}
-  & .remove-die-item {@apply w-1/4;}
-}
-
-.die-item-label, .item-edit {@apply min-h-8 p-2;}
 
 .die-item-actions-flex {@apply flex flex-row;}
 
-.die-item-label {
-  @apply cursor-pointer block p-1 w-full break-words;
+.add-die-item {@apply p-1 max-h-1/2 my-auto;}
 
-  &:hover {
-    @apply bg-grey-light;
-    transition: .2s;
+.die-action-button {
+  @apply rounded-none border-none;
+  @apply bg-brand-color-1 fill-current text-white;
+  @apply h-full;
+  &:hover {@apply bg-brand-color-dark;}
+
+  // &.remove-die {@apply absolute h-8 w-8 top-0 right-0;}
+  // &.disable-die {@apply absolute h-8 w-8 right-0; top: 2.25rem;}
+}
+
+.die-popover {
+  @apply text-black absolute top-0 right-0;
+
+  .die-popover-target {
+    @apply p-1;
+    @apply rounded-none rounded-bl-lg border-none;
+    @apply text-white;
   }
 }
 
-.add-die-item {@apply p-1;}
+.die-popover-content {
+  @apply bg-gray-700 shadow-lg rounded-lg;
+  @apply p-3;
 
-.die-action-button {
-  @apply rounded-none border-none bg-brand-color-1 fill-current text-white;
-  &:hover {@apply bg-brand-color-dark;}
+  & > div > * {@apply mb-2; }
+}
 
-  &.remove-die {@apply absolute h-8 w-8 pin-t pin-r;}
-  &.disable-die {@apply absolute h-8 w-8 pin-r; top: 2.25rem;}
+.die-status {
+  @apply p-1;
+  @apply absolute top-0 left-0;
+  @apply text-brand-color-dark;
 }
 </style>

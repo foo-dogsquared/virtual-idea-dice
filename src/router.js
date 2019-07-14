@@ -1,27 +1,27 @@
 import Router from 'vue-router'
 import Views from './views'
-import * as appConstants from './appConstants'
+import * as constants from './constants'
 
 export default new Router({
   routes: [
     {
-      path: appConstants.routes.home.path,
-      name: appConstants.routes.home.name,
+      path: constants.routes.home.path,
+      name: constants.routes.home.name,
       component: Views.Home
     },
     {
-      path: appConstants.routes.gettingStarted.path,
-      name: appConstants.routes.gettingStarted.name,
+      path: constants.routes.gettingStarted.path,
+      name: constants.routes.gettingStarted.name,
       component: Views.About
     },
     {
-      path: appConstants.routes.app.path,
-      name: appConstants.routes.app.name,
+      path: constants.routes.app.path,
+      name: constants.routes.app.name,
       component: Views.App
     },
     {
-      path: appConstants.routes.ideas.path,
-      name: appConstants.routes.ideas.name,
+      path: constants.routes.ideas.path,
+      name: constants.routes.ideas.name,
       component: Views.SavedIdeas
     }
   ]

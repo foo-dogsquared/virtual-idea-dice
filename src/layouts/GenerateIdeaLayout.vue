@@ -24,26 +24,33 @@
     <div class="action-buttons">
       <button class="add-die" @click="$emit('add-die')">Add an empty die</button>
       <button :class="{disabled: totalCombinations <= 1}" :disabled="totalCombinations <= 1" class="generate-idea" @click="$emit('generate-idea')">Generate idea</button>
-      <button :class="{disabled: ideas.length <= 0}" :disabled="ideas.length <= 0" class="clear-idea" @click="$emit('clear-idea')">Clear idea</button>
+      <button :class="{disabled: results.length <= 0}" :disabled="results.length <= 0" class="clear-idea" @click="$emit('clear-idea')">Clear idea</button>
     </div>
 
     <!-- Idea set result -->
-    <Draggable :noTransitionOnDrag="true" class="idea-result" :options="ideaDragOptions" :class="{ hidden: ideas.length <= 0 }">
-      <span v-for="idea in ideas" :key="idea.id" v-text="idea.name" class="idea"></span>
+    <Draggable :noTransitionOnDrag="true" class="idea-result" :options="ideaDragOptions" :class="{ hidden: results.length <= 0 }">
+      <span
+      v-for="idea in results"
+      :key="idea.id"
+      v-text="idea.shardName"
+      v-tooltip="{ content: `${idea.dieName}`, trigger: 'click hover', autoHide: false }"
+      class="idea"
+      ></span>
     </Draggable>
 
     <!-- Save idea layout -->
     <div class="save-idea-layout">
-      <button v-if="ideas.length > 1 && !isIdeaSaved" class="save-idea" @click="$emit('save-idea')">Save idea</button>
+      <button v-if="results.length > 1 && !isIdeaSaved" class="save-idea" @click="$emit('save-idea')">Save idea</button>
       <div v-if="isIdeaSaved">Your randomly generated idea setpieces has been saved! Head on over to the <router-link :to="appConstants.routes.ideas.path">ideas page</router-link> to see your idea sets that you've saved.</div>
-      <div v-else-if="ideas.length === 1">You only have one setpiece which is not really suitable for saving. Add another die and fill up some items.</div>
+      <div v-else-if="results.length === 1">You only have one setpiece which is not really suitable for saving. Add another die and fill up some items.</div>
     </div>
   </div>
 </template>
 
 <script>
 import * as Draggable from 'vuedraggable'
-import * as appConstants from '../appConstants'
+import * as appConstants from '../constants'
+import { VTooltip } from 'v-tooltip'
 
 export default {
   name: 'GenerateIdeaLayout',
@@ -56,7 +63,7 @@ export default {
       type: Boolean,
       required: true
     },
-    ideas: {
+    results: {
       type: Array,
       required: true
     }
@@ -114,6 +121,9 @@ export default {
   },
   components: {
     Draggable
+  },
+  directives: {
+    'tooltip': VTooltip
   }
 }
 </script>
@@ -133,16 +143,16 @@ export default {
 .die-combinations-stats {@apply text-center;}
 
 .idea-result {
-  @apply bg-brand-color-dark flex flex-row flex-wrap items-center justify-center mt-4 mb-4 p-3;
+  @apply bg-brand-color-dark flex flex-row flex-wrap items-center justify-center mt-4 mb-4 p-3 rounded-xl;
 }
 
 .idea {
-  @apply w-full m-3 p-3 border-dashed border-grey bg-brand-color-light cursor-pointer break-words;
+  @apply w-full m-3 p-3 border-dashed border-gray-700 bg-brand-color-light cursor-pointer break-words rounded-lg;
   @screen md {
     @apply w-1/4;
   }
 
-  &:hover {@apply bg-grey-lightest;}
+  &:hover {@apply bg-gray-300;}
 }
 
 .save-idea-layout {
@@ -151,5 +161,4 @@ export default {
 
 .save-idea {@apply p-4;}
 
-.delete-idea {@apply absolute border-none rounded-none w-10 h-10 pin-t pin-r;}
 </style>
