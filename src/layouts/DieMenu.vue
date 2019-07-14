@@ -126,11 +126,16 @@ export default {
     removeDie: function (dieObject) {
       const _dieObject = {}
       if (dieObject instanceof appConstants.Die) {
+        if (!dieObject.enabled) return
+
         _dieObject['index'] = this.dice.indexOf(dieObject)
         _dieObject['die'] = this.dice.splice(_dieObject['index'], 1)[0]
       } else if (typeof dieObject === 'number') {
+        _dieObject['die'] = this.dice[dieObject]
+        if (!_dieObject['die'].enabled) return
+
         _dieObject['index'] = dieObject
-        _dieObject['die'] = this.dice.splice(dieObject, 1)[0]
+        this.dice.splice(_dieObject['index'], 1)
       }
 
       if (!_dieObject) { return }
@@ -191,7 +196,10 @@ export default {
           const diceData = JSON.parse(event.target.result)
 
           if (typeof diceData === 'object' && diceData instanceof Array) {
-            this.dice = diceData
+            this.dice = []
+            for (const die of diceData) {
+              this.dice.push(new appConstants.Die(die))
+            }
           }
         }.bind(this))
         fileReader.readAsText(file)
@@ -230,9 +238,13 @@ export default {
       this.ideas = []
     },
     addIdea: function () {
-      if (this.ideas.shards.length < 2) return
+      if (this.ideas.length < 2) return
 
-      this.savedIdeas.push(this.ideas)
+      const newIdeaSet = new appConstants.IdeaSet()
+      for (const idea of this.ideas) {
+        newIdeaSet.addShard(idea)
+      }
+      this.savedIdeas.push(newIdeaSet)
       this.isIdeaSaved = true
     }
   },
@@ -278,21 +290,24 @@ export default {
         if (event.key === 'S' || event.key === 's') {
           event.preventDefault()
           this.addIdea()
-        } else if (event.shiftKey && (event.key === 'E' || event.key === 'e')) {
+        } else if (event.key === 'E' || event.key === 'e') {
           event.preventDefault()
           this.exportFile()
         } else if (event.key === 'G' || event.key === 'g' || event.key === 'Enter') {
           event.preventDefault()
           this.generateItems()
-        } else if (event.shiftKey && (event.key === 'I' || event.key === 'i')) {
+        } else if (event.key === 'I' || event.key === 'i') {
           event.preventDefault()
           this.openFilePrompt()
         } else if (event.key === 'D' || event.key === 'd') {
           event.preventDefault()
-          this.removeDie(this.currentPage)
+          this.clearGeneratedIdea()
         } else if (event.key === 'Z' || event.key === 'z') {
           event.preventDefault()
           this.undoRemoveDie()
+        } else if (event.key === 'Delete') {
+          event.preventDefault()
+          this.removeDie(this.currentPage)
         }
       }
 
@@ -301,15 +316,6 @@ export default {
         if (event.key === 'N' || event.key === 'n') {
           event.preventDefault()
           this.addDie()
-        }
-      }
-
-      // prevents entering a newline in any of the input since it is
-      // not allowed (I mean, it doesn't make sense to have a name with a
-      // newline)
-      if (event.target.tagName === 'TEXTAREA') {
-        if (event.key === 'Enter') {
-          event.target.blur()
         }
       }
     }

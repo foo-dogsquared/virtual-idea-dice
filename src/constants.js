@@ -86,6 +86,13 @@ export const routes = {
   }
 }
 
+export const colors = {
+  'brand-color-1': '#17a398',
+  'brand-color-dark': '#086375',
+  'brand-color-light': '#bfd7ea',
+  'black-transparent': 'rgba(0, 0, 0, 0.3)'
+}
+
 export const diceStorageKey = 'virtual-idea-dice'
 
 export const state = {
@@ -94,8 +101,22 @@ export const state = {
   ideaSetRenaming: 'idea-set-renaming'
 }
 
+// ID-related functions
+export const NUMBER_SYSTEM = 36
+export const MAXIMUM_NUMBER_OF_DIGITS = 5
+export const MAXIMUM_NUMBER_OF_COMBINATIONS = Math.pow(NUMBER_SYSTEM, MAXIMUM_NUMBER_OF_DIGITS)
+
 export function generateId () {
-  return Math.floor(Math.random() * (Number.MAX_SAFE_INTEGER / 2))
+  const code = Number(Math.floor(Math.random() * MAXIMUM_NUMBER_OF_COMBINATIONS)).toString(NUMBER_SYSTEM)
+  return code
+}
+
+export function convertToProgramNumberSystem (number) {
+  if (typeof number === 'number') {
+    return number.toString(NUMBER_SYSTEM)
+  } else if (typeof number === 'string' && !Number(`0x${number}`)) {
+    return generateId()
+  }
 }
 
 export const diceStorageInstance = localforage.createInstance({
@@ -108,29 +129,162 @@ export const ideasStorageInstance = localforage.createInstance({
   name: diceStorageKey
 })
 
+export const MAXIMUM_NAME_LENGTH = 256
+
 export class Die {
-  constructor ({ id = generateId(), name = `NewDie-${id}`, items = [], enabled = true } = {}) {
+  MAX_LENGTH = 64
+
+  /**
+   * A die object that holds die item that represents faces of the die.
+   * @param {Object} object - a destructured object that contains the option for
+   *                          building the Die
+   */
+  constructor ({ id = generateId(), name = id, items = [], enabled = true, locked = false } = {}) {
     this.name = name
+    // trimming the name if it goes over the maximum length
+    this.trimExtraCharacters()
+
     this.id = id
-    this.items = items
+
+    this.items = []
+    for (const dieItem of items) {
+      if (dieItem instanceof DieItem) {
+        this.items.push(dieItem)
+      } else if (dieItem instanceof Object && dieItem['name'] && dieItem['itemId']) {
+        const _dieItem = new DieItem(dieItem)
+        this.items.push(_dieItem)
+      }
+    }
+
     this.enabled = enabled
+    this.locked = locked
+  }
+
+  addDieItem (dieItem = undefined) {
+    if (!this.enabled || this.locked) return
+
+    let _dieItem
+
+    if (dieItem instanceof DieItem) _dieItem = dieItem
+    else _dieItem = new DieItem({ die: this })
+
+    this.items.push(_dieItem)
+
+    return _dieItem
+  }
+
+  removeDieItem (item) {
+    if (!this.enabled || this.locked) return
+
+    const itemIndex = this.items.indexOf(item)
+    this.items.splice(itemIndex, 1)
+  }
+
+  checkLockOrEnabled () {
+    if (!this.enabled || this.locked) return false
+
+    return true
+  }
+
+  toggleDisabling () {
+    this.enabled = !this.enabled
+  }
+
+  toggleLock () {
+    this.locked = !this.locked
+  }
+
+  trimExtraCharacters () {
+    if (this.name.length > this.MAX_LENGTH) {
+      this.name = this.name.slice(0, this.MAX_LENGTH)
+    }
+
+    this.name = this.name.trim()
   }
 }
 
 export class DieItem {
-  constructor (name, id = generateId()) {
+  MAX_LENGTH = 128
+
+  /**
+   * A die item is a basically like a face on the die object.
+   * @param {Object} options
+   */
+  constructor ({ name = undefined, id = generateId(), die = undefined }) {
+    if (name) {
+      this.name = name
+    } else if (!name && die && die instanceof Die) {
+      this.name = `${die.name}-${id}`
+    } else {
+      this.name = 'New Die Item'
+    }
+
     this.itemId = id
+  }
+
+  trimExtraCharacters () {
+    if (this.name > this.MAX_LENGTH) {
+      this.name = this.name.slice(0, this.MAX_LENGTH)
+    }
+
+    this.name = this.name.trim()
+  }
+}
+
+export class IdeaSet {
+  MAX_LENGTH = 64
+  /**
+   * An idea set made up of the results from 'rolling of the dice set'.
+   * @param {Object} options - an object that specifies options for building
+   *
+   */
+  constructor ({ id = generateId(), name = `Idea Set #${id}`, shards = undefined } = {}) {
+    this.id = id
     this.name = name
+    this.shards = shards || []
+  }
+
+  /**
+   * Adds an idea shard to the set.
+   * @param {IdeaShard} ideaShard - the idea shard to be added
+   */
+  addShard (ideaShard) {
+    if (!(ideaShard instanceof IdeaShard)) return
+    this.shards.push(ideaShard)
+  }
+
+  trimExtraCharacters () {
+    if (this.name.length > this.MAX_LENGTH) {
+      this.name = this.name.slice(0, this.MAX_LENGTH)
+    }
+
+    this.name = this.name.trim()
+  }
+}
+
+export class IdeaShard {
+  /**
+   * A constructor for idea shards that make up an idea set.
+   * @param {DieItem} name - the name of the item shard/element of the set
+   * @param {Die} die - the instance of a Die object where the shard came from
+   */
+  constructor (item, die) {
+    if (!(die instanceof Die) && !(item instanceof DieItem)) return
+
+    this.shardId = item.itemId
+    this.shardName = item.name
+    this.dieName = die.name
+    this.dieId = die.id
   }
 }
 
 export const atomicShrimpSampleDiceSet = [
-  new Die({ name: 'Power source', items: [ new DieItem('Manual'), new DieItem('Electric'), new DieItem('Clockwork'), new DieItem('Solar'), new DieItem('Wind'), new DieItem('Water') ] }),
-  new Die({ name: 'Size', items: [ new DieItem('Giant'), new DieItem('Mini'), new DieItem('Pocket'), new DieItem('Portable'), new DieItem('Inhabitable'), new DieItem('Wearable') ] }),
-  new Die({ name: 'Material', items: [ new DieItem('Metal'), new DieItem('Wood'), new DieItem('Plastic'), new DieItem('Edible'), new DieItem('Organic'), new DieItem('Paper') ] }),
-  new Die({ name: 'Device', items: [ new DieItem('Robot'), new DieItem('Vehicle'), new DieItem('Game'), new DieItem('Tool'), new DieItem('Art'), new DieItem('Computer') ] }),
-  new Die({ name: 'Scope', items: [ new DieItem('Family'), new DieItem('Personal'), new DieItem('Office'), new DieItem('Industrial'), new DieItem('Public'), new DieItem('Home') ] }),
-  new Die({ name: 'Implementation type', items: [ new DieItem('Random'), new DieItem('Flying'), new DieItem('Underwater'), new DieItem('Stealth'), new DieItem('Disposable'), new DieItem('Self-build') ] })
+  new Die({ name: 'Power source', items: [ new DieItem({ name: 'Manual' }), new DieItem({ name: 'Electric' }), new DieItem({ name: 'Clockwork' }), new DieItem({ name: 'Solar' }), new DieItem({ name: 'Wind' }), new DieItem({ name: 'Water' }) ] }),
+  new Die({ name: 'Size', items: [ new DieItem({ name: 'Giant' }), new DieItem({ name: 'Mini' }), new DieItem({ name: 'Pocket' }), new DieItem({ name: 'Portable' }), new DieItem({ name: 'Inhabitable' }), new DieItem({ name: 'Wearable' }) ] }),
+  new Die({ name: 'Material', items: [ new DieItem({ name: 'Metal' }), new DieItem({ name: 'Wood' }), new DieItem({ name: 'Plastic' }), new DieItem({ name: 'Edible' }), new DieItem({ name: 'Organic' }), new DieItem({ name: 'Paper' }) ] }),
+  new Die({ name: 'Device', items: [ new DieItem({ name: 'Robot' }), new DieItem({ name: 'Vehicle' }), new DieItem({ name: 'Game' }), new DieItem({ name: 'Tool' }), new DieItem({ name: 'Art' }), new DieItem({ name: 'Computer' }) ] }),
+  new Die({ name: 'Scope', items: [ new DieItem({ name: 'Family' }), new DieItem({ name: 'Personal' }), new DieItem({ name: 'Office' }), new DieItem({ name: 'Industrial' }), new DieItem({ name: 'Public' }), new DieItem({ name: 'Home' }) ] }),
+  new Die({ name: 'Implementation type', items: [ new DieItem({ name: 'Random' }), new DieItem({ name: 'Flying' }), new DieItem({ name: 'Underwater' }), new DieItem({ name: 'Stealth' }), new DieItem({ name: 'Disposable' }), new DieItem({ name: 'Self-build' }) ] })
 ]
 
 export const diceStorage = {
@@ -158,7 +312,7 @@ export const ideaStorage = {
   fetch: function () {
     const ideas = []
     return ideasStorageInstance.iterate(function (value, key, index) {
-      ideas.push({ 'id': Number(key), 'shards': value.shards, 'name': value.name })
+      ideas.push(new IdeaSet(value))
     })
       .then(function () {
         return Promise.resolve(ideas)
@@ -171,7 +325,7 @@ export const ideaStorage = {
     ideasStorageInstance.clear()
 
     for (const idea of ideas) {
-      ideasStorageInstance.setItem(String(idea.id), { 'shards': idea.shards, 'name': idea.name })
+      ideasStorageInstance.setItem(String(idea.id), idea)
     }
   }
 }

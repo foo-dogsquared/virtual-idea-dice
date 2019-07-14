@@ -5,14 +5,23 @@ html {
 }
 
 button {
-  @apply flex items-center justify-center cursor-pointer bg-brand-color-1 text-white rounded-full border-2 border-brand-color-1;
-  
-  &.disabled {
-    @apply bg-transparent text-brand-color-light border-brand-color-light cursor-not-allowed;
-    &:hover {@apply bg-transparent border-brand-color-light text-brand-color-light;}
+  @apply p-2;
+  @apply flex items-center justify-center rounded-full border-2;
+  @apply bg-brand-color-1 text-white;
+  @apply cursor-pointer;
+
+  &:hover {@apply bg-brand-color-dark text-white;}
+
+  &:disabled {
+    @apply bg-gray-600 text-gray-300;
+    @apply cursor-not-allowed;
+
+    &:hover {@apply bg-gray-500;}
   }
 
-  &:hover {@apply bg-brand-color-dark border-brand-color-dark text-white;}
+  svg {
+    @apply w-6;
+  }
 }
 
 a {@apply text-white;}
@@ -24,3 +33,22 @@ header, footer {@apply w-full bg-brand-color-1 p-4 mx-auto text-white;}
 // headings
 h1 {@apply text-2xl font-black;}
 h2 {@apply text-xl font-extrabold;}
+
+textarea,
+input[type="text"],
+input[type="url"],
+input[type="email"],
+input[type="password"] {
+  transition: .2s;
+
+  &:disabled {@apply bg-transparent text-gray-600 cursor-not-allowed;}
+
+  &:hover {@apply bg-gray-300 cursor-pointer;}
+
+  &:focus {@apply bg-gray-400 cursor-text;}
+}
+
+svg {
+  @apply h-full w-8;
+  @apply fill-current;
+}

@@ -5,8 +5,6 @@
     :editingIdeaSet="editingideaSet"
     :state="state"
     @remove-idea="removeIdea"
-    @edit-idea-set-name="editIdeaSetName"
-    @done-edit-idea-set-name="doneEditIdeaSetName"
     ></SavedIdeasLayout>
   </div>
 </template>
@@ -22,9 +20,7 @@ export default {
   },
   data: function () {
     return {
-      savedIdeas: [],
-      editingideaSet: null,
-      state: null
+      savedIdeas: []
     }
   },
   watch: {
@@ -36,14 +32,6 @@ export default {
     }
   },
   methods: {
-    editIdeaSetName: function (ideaSet) {
-      this.editingideaSet = ideaSet
-      this.state = appConstants.state.ideaSetRenaming
-    },
-    doneEditIdeaSetName: function () {
-      this.editingideaSet = null
-      this.state = null
-    },
     removeIdea: function (ideaObject) {
       this.savedIdeas.splice(this.savedIdeas.indexOf(ideaObject), 1)
     }

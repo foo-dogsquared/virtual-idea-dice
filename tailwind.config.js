@@ -8,10 +8,15 @@ module.exports = {
     },
     extend: {
       colors: {
+        'current': 'currentColor',
         'brand-color-1': '#17a398',
         'brand-color-dark': '#086375',
         'brand-color-light': '#bfd7ea',
         'black-transparent': 'rgba(0, 0, 0, 0.3)'
+      },
+      borderRadius: {
+        'xl': '1em',
+        '2xl': '2em'
       },
       screens: {
         'xs': '350px'

@@ -30,8 +30,10 @@
     <!-- Idea set result -->
     <Draggable :noTransitionOnDrag="true" class="idea-result" :options="ideaDragOptions" :class="{ hidden: results.length <= 0 }">
       <span
-      v-for="idea in results" :key="idea.id" v-text="idea.shardName"
-      v-tooltip="{ content: idea.dieName, trigger: 'focus' }"
+      v-for="idea in results"
+      :key="idea.id"
+      v-text="idea.shardName"
+      v-tooltip="{ content: `${idea.dieName}`, trigger: 'click hover', autoHide: false }"
       class="idea"
       ></span>
     </Draggable>
@@ -159,5 +161,4 @@ export default {
 
 .save-idea {@apply p-4;}
 
-.delete-idea {@apply absolute border-none rounded-none w-10 h-10 top-0 right-0;}
 </style>
