@@ -7,20 +7,34 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 == [Unreleased]
 === Added
+* Locking function for the die in case you want to not accidentally modify the die 
+(i.e. adding/removing items, editing items) or something.
+
+* Disabling dice now prevents you from modifying anything in the die 
+(it's not a bug, it's a feature, I swear...). It basically functions as a lock 
+function except it doesn't count towards any of the app's operations as if it 
+was deleted or never existed in the first place.
+
+* Set a maximum length set for die name, die items, and idea set names. Here's the 
+following specifications:
+** For die and idea set names, *its length must be less than 64 characters*.
+** For die items, *its length must be less than 32 characters*.
+** There's no format for the required characters. You can put all of the exclamation marks, 
+emojis, and semicolons all you want.
+
 * 'Undo' function for previously deleted dice (you can only retrieve up to 20 recently 
-deleted dice at any given time)
+deleted dice at any given time). Take note that you can only hold it in the current session. 
+Changing pages or reloading will lose the deleted dice stack.
 
 * New keyboard shortcuts to the main app page
 ** `Shift + N` for a new die
 ** `Ctrl + G` for generating an idea set
-** `Ctrl + D` or `Ctrl + Delete` for clearing the generated output
+** `Ctrl + D` for clearing the generated output
 ** `Ctrl + S` for saving the output in the idea set database
-** `Ctrl + Shift + I` for importing dice set file
-** `Ctrl + Shift + E` or `Ctrl + S` for exporting the current dice set
+** `Ctrl + I` for importing dice set file
+** `Ctrl + E` for exporting the current dice set
+** `Ctrl + Delete` for deleting the current die shown in the screen
 ** `Ctrl + Z` for adding back the most recent deleted die
-
-* Disabling dice now prevents you from modifying anything in the die 
-(it's not a bug, it's a feature, I swear...).
 
 === Changed
 * Unique ID format has been revised to base 36 to produce less data while being able 
@@ -37,6 +51,6 @@ it's constantly present with the item since it produces weird quirks
 and it just feels unnatural on the UX side.
 
 * Use of https://tailwindcss.com[Tailwind CSS] 1.0 therefore 
-https://tailwindcss.com/docs/release-notes/#tailwind-css-v1-0[big changes happened to its Tailwind config file]
+https://tailwindcss.com/docs/release-notes/#tailwind-css-v1-0[big changes happened to its Tailwind config file].
 ** A minor site aesthetic change has also occured as a side effect of the major upgrade due to the new approach
 of Tailwind CSS. Also, because of that, the UX has also improved.

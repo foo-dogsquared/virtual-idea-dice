@@ -11,16 +11,23 @@ see it https://www.youtube.com/watch?v=NBdVpiWUKhU[right here].
 image::./docs/assets/demo.gif[Demo of the app]
 
 == Features of the app
-* Defining your own set of virtual idea dice set (or VIDS, as I call them)
+* It's mostly built as an offline app so once you've visited the app, you'll be 
+ready to go. No installation required. 
+** Being a 
+https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Introduction[progressive web app (PWA)], 
+you can even make it _almost_ like a native mobile app on your phone
+by adding the app page into the home screen.
 
-* Storing VIDS in IndexedDB (with https://localforage.github.io/localForage/[localforage])
+* Defining your own set of virtual idea dice set (or VIDS, as I call them).
+
+* Storing VIDS in IndexedDB (with https://localforage.github.io/localForage/[localforage]).
 
 * Import and export of VIDS with a JSON file
--- You can see some sample dice sets in the link:examples/[`examples/` directory] and import 
+** You can see some sample dice sets in the link:examples/[`examples/` directory] and import 
 them to see it. Be sure to export your dice set first since the app can only have one set 
 (at least for now).
 
-* Saving dice results in IndexedDB (with https://localforage.github.io/localForage/[localforage])
+* Saving dice results in IndexedDB (with https://localforage.github.io/localForage/[localforage]).
 
 == Development build
 If you want to open this app locally on your machine, just do the following:
