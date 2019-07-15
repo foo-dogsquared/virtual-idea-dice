@@ -6,9 +6,10 @@ html {
 
 button {
   @apply p-2;
-  @apply flex items-center justify-center rounded-full border-2;
+  @apply flex justify-center rounded-full border-2;
   @apply bg-brand-color-1 text-white;
   @apply cursor-pointer;
+  @apply h-auto;
 
   &:hover {@apply bg-brand-color-dark text-white;}
 
@@ -20,11 +21,13 @@ button {
   }
 
   svg {
-    @apply w-6;
+    @apply block m-auto;
+    @apply w-6 h-6;
   }
 }
 
 a {@apply text-white;}
+p {@apply mb-2;}
 
 blockquote {@apply pl-8 pr-4 pt-4 pb-4 ml-8 mb-4 mt-4 bg-gray-300 border-gray-700 border-l-4 italic;}
 
@@ -33,6 +36,13 @@ header, footer {@apply w-full bg-brand-color-1 p-4 mx-auto text-white;}
 // headings
 h1 {@apply text-2xl font-black;}
 h2 {@apply text-xl font-extrabold;}
+
+kbd {
+  @apply border-black border-2 rounded-sm;
+  @apply bg-gray-200;
+  @apply font-bold text-xs;
+  @apply p-1;
+}
 
 textarea,
 input[type="text"],
@@ -49,6 +59,5 @@ input[type="password"] {
 }
 
 svg {
-  @apply h-full w-8;
   @apply fill-current;
 }
