@@ -6,8 +6,6 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 == [Unreleased]
-
-== [0.2.0] - 2019-07-14
 === Added
 * A help section in the main app page.
 ** You can also access the help section with `F1`.
