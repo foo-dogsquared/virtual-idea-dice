@@ -204,7 +204,7 @@ export class Die {
 }
 
 export class DieItem {
-  MAX_LENGTH = 128
+  MAX_LENGTH = 64
 
   /**
    * A die item is a basically like a face on the die object.
@@ -223,7 +223,7 @@ export class DieItem {
   }
 
   trimExtraCharacters () {
-    if (this.name > this.MAX_LENGTH) {
+    if (this.name.length > this.MAX_LENGTH) {
       this.name = this.name.slice(0, this.MAX_LENGTH)
     }
 
