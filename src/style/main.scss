@@ -1,9 +1,20 @@
 @tailwind base;
 
+@import "base";
+
+ul {
+  list-style-type: disc;
+  padding-left: theme('padding.4');
+}
+
+ol {
+  list-style-type: decimal;
+  padding-left: theme('padding.4');
+}
+
 @tailwind components;
 
 @import 
-  "base",
   "components"
 ;
 

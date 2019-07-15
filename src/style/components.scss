@@ -160,3 +160,33 @@
     transition: opacity .15s;
   }
 }
+
+.modal {
+  @apply max-w-2xl h-full;
+  @apply rounded-lg;
+  @apply relative overflow-hidden;
+
+  box-sizing: border-box;
+}
+
+.modal-header {
+  @apply text-center text-2xl font-bold underline;
+  @apply p-2;
+}
+
+.modal-close-button {
+  @apply w-12;
+  @apply absolute top-0 right-0;
+  @apply border-none rounded-none;
+}
+
+.modal-description {
+  @apply bg-white;
+  @apply flex flex-col flex-wrap justify-center content-center;
+  @apply p-4;
+  @apply overflow-auto;
+
+  ul {
+    @screen sm {column-count: 2;}
+  }
+}
