@@ -29,12 +29,44 @@
     @clear-idea="clearGeneratedIdea"
     @save-idea="addIdea"
     @set-sample-set="setSampleSet"
+    @import-file="importFile"
+    @export-file="exportFile"
+    @lock-dice="toggleAllDiceLock"
     ></GenerateIdeaLayout>
-    <div class="action-buttons">
-      <button class="export-dice" :class="{disabled: dice.length <= 0}" :disabled="dice.length <= 0" @click="exportFile">Export dice</button>
-      <input type="file" id="import-file-dice-form" accept="application/json" @change="importFile" hidden>
-      <button class="import-file-dice-button" @click="openFilePrompt">Import dice (file)</button>
-    </div>
+
+    <button class="help-button" @click="$modal.show('help-modal')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.601 21.5c0 1.38-1.116 2.5-2.499 2.5-1.378 0-2.499-1.12-2.499-2.5s1.121-2.5 2.499-2.5c1.383 0 2.499 1.119 2.499 2.5zm-2.42-21.5c-4.029 0-7.06 2.693-7.06 8h3.955c0-2.304.906-4.189 3.024-4.189 1.247 0 2.57.828 2.684 2.411.123 1.666-.767 2.511-1.892 3.582-2.924 2.78-2.816 4.049-2.816 7.196h3.943c0-1.452-.157-2.508 1.838-4.659 1.331-1.436 2.986-3.222 3.021-5.943.047-3.963-2.751-6.398-6.697-6.398z"/></svg>
+    </button>
+
+    <HelpModal>
+      <template v-slot:description>
+        <p>
+          Hello and welcome to <b>Virtual Idea Dice</b>! This is an app used to create
+          and play with "idea dice". It's all about exploration with your imagination.
+          You can use it whether you're stuck with ideas or just want to pass the time.
+        </p>
+
+        <p>
+          If you're on a computer keyboard, you can make use of keyboard shortcuts.
+          Here's the following keys and their functions:
+          <ul>
+            <li><kbd>F1</kbd> - View the help section</li>
+            <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> - Add a new empty die</li>
+            <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> - Add a new die item on the current die</li>
+            <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> - Lock all dice</li>
+            <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>:</kbd> - Unlock all dice</li>
+            <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>"</kbd> - Toggle all die locks</li>
+            <li><kbd>Ctrl</kbd> + <kbd>Delete</kbd> - Delete the currently shown die</li>
+            <li><kbd>Ctrl</kbd> + <kbd>Z</kbd> - Retrieve the most recent deleted die</li>
+            <li><kbd>Ctrl</kbd> + <kbd>G</kbd> - Roll the dice set</li>
+            <li><kbd>Ctrl</kbd> + <kbd>S</kbd> - Save the results into an idea set</li>
+            <li><kbd>Ctrl</kbd> + <kbd>D</kbd> - Clear the dice results</li>
+            <li><kbd>Ctrl</kbd> + <kbd>E</kbd> - Export the dice set</li>
+            <li><kbd>Ctrl</kbd> + <kbd>I</kbd> - Import a dice set</li>
+          </ul>
+        </p>
+      </template>
+    </HelpModal>
   </div>
 </template>
 
@@ -50,6 +82,7 @@ export default {
   components: {
     DieComponent: components.DieComponent,
     GenerateIdeaLayout: GenerateIdeaLayout,
+    HelpModal: components.HelpModal,
     Carousel: Carousel,
     Slide: Slide
   },
@@ -63,7 +96,6 @@ export default {
       savedIdeas: [],
       isIdeaSaved: false,
       dieStack: [],
-      showHelp: false,
       currentPage: 0
     }
   },
@@ -175,13 +207,20 @@ export default {
       this.currentPage = pageNumber
     },
 
+    /**
+     * die lock functions
+     */
+    toggleAllDiceLock: function (type) {
+      for (const die of this.dice) {
+        if (type === 'toggle') die.toggleLock()
+        else if (type === 'lock') die.locked = true
+        else if (type === 'unlock') die.locked = false
+      }
+    },
+
     /*
      * file related functions
      */
-    openFilePrompt: function () {
-      document.querySelector("input[type='file']#import-file-dice-form").click()
-    },
-
     /**
      * @function importFile - simply reads the file to be imported;
      *                        it has no form of validation so it is vulnerable to
@@ -197,6 +236,7 @@ export default {
 
           if (typeof diceData === 'object' && diceData instanceof Array) {
             this.dice = []
+            this.dieStack = []
             for (const die of diceData) {
               this.dice.push(new appConstants.Die(die))
             }
@@ -206,6 +246,8 @@ export default {
       }
     },
     exportFile: function () {
+      if (this.dice.length <= 0) return
+
       appConstants.diceStorage.fetch().then(function (dice) {
         const diceBlob = new Blob([JSON.stringify(dice)], { type: 'application/json;charset=utf-8' })
         saveAs(diceBlob, 'yourDice.json')
@@ -272,6 +314,9 @@ export default {
     },
     colors: function () {
       return appConstants.colors
+    },
+    appName: function () {
+      return appConstants.appName
     }
   },
   created: async function () {
@@ -312,11 +357,28 @@ export default {
       }
 
       // Shift + <KEY> shortcuts
-      if (event.shiftKey) {
+      if (event.shiftKey && event.ctrlKey) {
         if (event.key === 'N' || event.key === 'n') {
           event.preventDefault()
           this.addDie()
+        } else if (event.key === 'M' || event.key === 'm') {
+          event.preventDefault()
+          this.dice[this.currentPage].addDieItem()
+        } else if (event.key === 'L' || event.key === 'l') {
+          event.preventDefault()
+          this.toggleAllDiceLock('lock')
+        } else if (event.key === ':' || event.key === ';') {
+          event.preventDefault()
+          this.toggleAllDiceLock('unlock')
+        } else if (event.key === '\'' || event.key === '"') {
+          event.preventDefault()
+          this.toggleAllDiceLock('toggle')
         }
+      }
+
+      if (event.key === 'F1') {
+        event.preventDefault()
+        this.$modal.show('help-modal')
       }
     }
 
@@ -331,5 +393,10 @@ export default {
 <style lang="scss">
 .die-menu {
   & > *:last-child {@apply mb-4;}
+}
+
+.help-button {
+  @apply fixed bottom-0 right-0;
+  @apply m-4;
 }
 </style>
