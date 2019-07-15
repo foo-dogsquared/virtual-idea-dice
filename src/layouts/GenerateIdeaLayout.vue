@@ -38,13 +38,13 @@
         s15.67-35,35-35s35,15.67,35,35S370.58,386.25,351.25,386.25z M351.25,138.75c-19.33,0-35-15.67-35-35s15.67-35,35-35
         s35,15.67,35,35S370.58,138.75,351.25,138.75z"/></svg>
       </button>
-      <button v-tooltip="'Lock all dice'" @click.left="$emit('lock-dice', 'lock')">
+      <button :disabled="dice.length <= 0" v-tooltip="'Lock all dice'" @click.left="$emit('lock-dice', 'lock')">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>
       </button>
-      <button v-tooltip="'Unlock all dice'" @click.left="$emit('lock-dice', 'unlock')">
+      <button :disabled="dice.length <= 0" v-tooltip="'Unlock all dice'" @click.left="$emit('lock-dice', 'unlock')">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-4v14h18v-14h-12z"/></svg>
       </button>
-      <button v-tooltip="'Toggle all die locks'" @click.left="$emit('lock-dice', 'toggle')">
+      <button :disabled="dice.length <= 0" v-tooltip="'Toggle all die locks'" @click.left="$emit('lock-dice', 'toggle')">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 21v3h-18v-3h18zm-13-15c0-2.206 1.795-4 4-4s4 1.794 4 4v3h2v-3c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3zm13 8v-3h-18v3h18zm0 5v-3h-18v3h18z"/></svg>
       </button>
       <button v-tooltip="'Export dice'" :disabled="dice.length <= 0" @click="$emit('export-file')">
