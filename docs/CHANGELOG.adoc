@@ -7,6 +7,38 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 == [Unreleased]
 === Added
+* A help section in the main app page.
+** You can also access the help section with `F1`.
+
+* New app functionalities for locking dice sets:
+** Locking all of the dice
+** Unlocking all of the dice
+** Toggling all of the dice lock
+
+* New keyboard shortcuts to the main app page: 
+** `Ctrl + Shift + M` for adding a new die item on the currently shown die.
+** `Ctrl + Shift + L` for locking all of the dice regardless of their lock status.
+** `Ctrl + Shift + :` for unlocking all of the dice regardless of their lock status.
+** `Ctrl + Shift + "` for toggling all of the dice locks (unlock if the die is locked, vice versa).
+
+=== Changed
+* Revise the UI (for the second time). Here's the detail of some 
+of the notable UI changes:
+** Change the text into icons in the buttons. It also cause the main 
+UI to be shorter (which means it's also a less pain to use it in a mobile 
+device).
+** Also, the buttons are now into a consistent button group.
+** The "Add die item" button in the die component moved inside of the die popover.
+Now it feels like an proper group of actions in the popover.
+** The die component also got a overhaul with the "fancy" two column into a 
+simple and more comprehensive one column on bigger screens similar to the mobile 
+screen format.
+
+* The "new die" keyboard shortcut now maps to `Ctrl + Shift + N` 
+(yes, that was stupid of me...)
+
+== [0.2.0] - 2019-07-14
+=== Added
 * Locking function for the die in case you want to not accidentally modify the die 
 (i.e. adding/removing items, editing items) or something.
 

@@ -33,24 +33,19 @@ them to see it. Be sure to export your dice set first since the app can only hav
 If you want to open this app locally on your machine, just do the following:
 
 * clone this repo or download the zip of this repo provided
-* fetch from the files from the dev (`develop`) branch
+* fetch the files from the dev (`develop`) branch
 * install all of the dependencies needed (`npm i`)
 * open the app over `localhost` with `npm run serve`
 
-If you want to contribute through code, you can look at the link:docs/CHANGELOG.adoc[changelog] 
-in the dev (`develop`) branch for the latest features that has been implemented so far. 
-Also, it contains some future features that is to be considered.
-
-If you want to contribute through writing and/or improving documentations, have a quick look at 
-https://asciidoctor.org/[Asciidoctor] since it is the formatting language used for writing docs 
-around here. It's basically a (more comprehensive) alternative to Markdown. 
-
-Speaking of Markdown, you can take a good look 
-https://asciidoctor.org/docs/user-manual/#compared-to-markdown[here] if you're familiar with 
-Markdown for a quick start.
-
 Aaaaaaaand voila! It's open now! 😁
 
+=== Extra
+Also, for future references:
+
+* Node v11.3.0
+* npm 6.4.1
+
+== Contribution
 If you want to contribute or just add features that you want, take note of the following configurations:
 
 * created with https://cli.vuejs.org/guide/[Vue CLI] 
@@ -65,10 +60,38 @@ https://github.com/standard/standard[standard style guide] as the configuration
 and the author are located in link:src/constants.js[`./src/constants.js`], I've made it 
 so that I can update it easily in one place
 
-Also, for future references:
+=== Code
+If you want to contribute through code, you can look at the link:docs/CHANGELOG.adoc[changelog] 
+in the dev (`develop`) branch for the latest features that has been implemented so far. 
+Also, it contains some future features that is to be considered.
 
-* Node v11.3.0
-* npm 6.4.1
+=== Documentation
+If you want to contribute through writing and/or improving documentations, have a quick look at 
+https://asciidoctor.org/[Asciidoctor] since it is the formatting language used for writing docs 
+around here. It's basically a (more comprehensive) alternative to Markdown. 
+
+Speaking of Markdown, you can take a good look 
+https://asciidoctor.org/docs/user-manual/#compared-to-markdown[here] 
+if you're familiar with Markdown for a quick start.
+
+=== Issues
+If you want to report bugs or suggest a feature, you can file an issue in the 
+https://github.com/foo-dogsquared/virtual-idea-dice/issues[issue tracker]. 
+
+Just make sure the title is brief and concise with the type of issue you're 
+filing (bug, feature, enhancement, etc.) and leave all the details in the 
+body of the issue.
+
+== Resources
+Big shoutout to 
+https://www.youtube.com/channel/UCSl5Uxu2LyaoAoMMGp6oTJA[Atomic Shrimp]'s
+https://youtu.be/NBdVpiWUKhU[Invention Dice project] 
+for the main inspiration for this project. Also, I've got this 
+https://youtu.be/U9a_b3piWqw[project to be featured (at 4:15 mark)] 
+by the man behind the idea himself. :)
+
+Icons used from https://iconmonstr.com/[IconMonstr] and 
+https://freepik.com/[Freepik].
 
 == Todo
 * Multiple virtual idea dice set (VIDS) support
