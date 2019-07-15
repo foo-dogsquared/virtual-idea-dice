@@ -2,8 +2,6 @@
   <div class="previous-ideas">
     <SavedIdeasLayout
     :savedIdeas="savedIdeas"
-    :editingIdeaSet="editingideaSet"
-    :state="state"
     @remove-idea="removeIdea"
     ></SavedIdeasLayout>
   </div>
