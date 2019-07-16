@@ -49,8 +49,6 @@ input[type="text"],
 input[type="url"],
 input[type="email"],
 input[type="password"] {
-  transition: .2s;
-
   &:disabled {@apply bg-transparent text-gray-600 cursor-not-allowed;}
 
   &:hover {@apply bg-gray-300 cursor-pointer;}

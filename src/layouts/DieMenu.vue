@@ -7,6 +7,7 @@
       :paginationActiveColor="colors['brand-color-dark']"
       paginationPosition="bottom"
       :paginationSize="20"
+      :minSwipeDistance="100"
       @page-change="setCurrentPage"
       >
         <Slide v-for="die in dice"
@@ -89,9 +90,6 @@ export default {
   data: function () {
     return {
       dice: [],
-      editingDie: null,
-      editingDieItem: null,
-      state: null,
       ideas: [],
       savedIdeas: [],
       isIdeaSaved: false,
@@ -100,28 +98,6 @@ export default {
     }
   },
   methods: {
-    /*
-    * State functions
-    */
-    editDieName: function (die) {
-      if (die.enabled) {
-        this.editingDie = die
-        this.state = appConstants.state.dieRenaming
-      }
-    },
-    editDieItem: function ({ die, item }) {
-      if (die.enabled) {
-        this.editingDie = die
-        this.editingDieItem = item
-        this.state = appConstants.state.itemEditing
-      }
-    },
-    doneEditDieItem: function () {
-      this.editingItem = null
-      this.editingItemCache = null
-      this.state = null
-    },
-
     /*
     * Die-related functions
     */
@@ -164,6 +140,7 @@ export default {
         _dieObject['die'] = this.dice.splice(_dieObject['index'], 1)[0]
       } else if (typeof dieObject === 'number') {
         _dieObject['die'] = this.dice[dieObject]
+        if (!_dieObject['die']) return
         if (!_dieObject['die'].enabled) return
 
         _dieObject['index'] = dieObject
@@ -196,7 +173,8 @@ export default {
      *                          without relying on multiple JSON dice set files
      */
     setSampleSet: function () {
-      this.dice = appConstants.atomicShrimpSampleDiceSet
+      this.dieStack = []
+      this.dice = Array.from(appConstants.atomicShrimpSampleDiceSet)
     },
 
     /**
@@ -228,7 +206,7 @@ export default {
      *                        considered
      */
     importFile: function () {
-      const files = document.querySelector("input[type='file']#import-file-dice-form").files
+      const files = document.querySelector("input[type='file']").files
       for (const file of files) {
         const fileReader = new FileReader()
         fileReader.addEventListener('loadend', function (event) {
@@ -338,7 +316,7 @@ export default {
         } else if (event.key === 'E' || event.key === 'e') {
           event.preventDefault()
           this.exportFile()
-        } else if (event.key === 'G' || event.key === 'g' || event.key === 'Enter') {
+        } else if (event.key === 'G' || event.key === 'g') {
           event.preventDefault()
           this.generateItems()
         } else if (event.key === 'I' || event.key === 'i') {
@@ -380,6 +358,12 @@ export default {
         event.preventDefault()
         this.$modal.show('help-modal')
       }
+
+      // setting up Enter key for input and textareas to blur when
+      // pressed Enter
+      if (event.key === 'Enter' && (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA')) {
+        event.target.blur()
+      }
     }
 
     document.addEventListener('keydown', this._keyListener.bind(this))
@@ -397,6 +381,9 @@ export default {
 
 .help-button {
   @apply fixed bottom-0 right-0;
+  @apply opacity-50;
   @apply m-4;
+
+  &:hover {@apply opacity-100;}
 }
 </style>
