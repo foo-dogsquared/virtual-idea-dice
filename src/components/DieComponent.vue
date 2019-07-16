@@ -98,21 +98,6 @@ export default {
         this.checkForLabel(index)
       }
     },
-    checkForLabel: function (index) {
-      this.$nextTick(function () {
-        const container = this.$refs.itemName[index]
-        const label = container.querySelector('label.die-item-name')
-        const labelStyle = window.getComputedStyle(label)
-        if (container.clientHeight > 60 && label.innerText.length > 20 && labelStyle.fontSize >= '18px') container.style.gridRow = 'auto / span 2'
-        else container.style.gridRow = ''
-      })
-    },
-    updateLabels: function () {
-      const dieItems = this.$refs.itemName
-      for (let index = 0; index < dieItems.length; index++) {
-        this.checkForLabel(index)
-      }
-    },
     // for drag events
     onMove: function ({ relatedContext, draggedContext }) {
       const relatedElement = relatedContext.element
