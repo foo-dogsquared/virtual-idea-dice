@@ -6,6 +6,22 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 == [Unreleased]
+=== Changed
+* Improved the UI/UX of form inputs.
+
+* Classes and components has been changed/refactored. 
+Here's a list of notable changes:
+** Classes has been restructured to make the output data less 
+bloated.
+** Die action buttons are grouped. This allows for less clutter 
+while being able to introduce more functions in the future.
+** Form inputs now works as expected on 'Enter' keypress.
+** Textareas are now used instead of the label/input pair. 
+** Dynamic grid layout on die items has been 'improved' 
+(by measuring the length of the input, lol). This is also needed 
+now that `<textarea>` is being used.
+
+== [0.3.0] - 2019-07-15
 === Added
 * A help section in the main app page.
 ** You can also access the help section with `F1`.
