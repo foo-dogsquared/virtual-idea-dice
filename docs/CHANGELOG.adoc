@@ -6,6 +6,8 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 == [Unreleased]
+
+== [0.3.1] - 2019-07-16
 === Changed
 * Improved the UI/UX of form inputs.
 
