@@ -1,9 +1,8 @@
 <template>
   <div :class="{ disabled: !die.enabled }" class="die">
     <input class="die-type" type="text"
-    ref="dieType"
     v-model="die.name"
-    @blur="die.name = die.name.length <= 0 ? die.id : die.name.trim()"
+    @blur="die.name = die.name.length <= 0 ? die.id : die.name.trim(); die.trimExtraCharacters()"
     :disabled="!die.checkLockOrEnabled()"
     >
     <div class="die-items">
@@ -12,21 +11,13 @@
       class="die-item-name-container"
       ref="itemName"
       >
-        <label class="die-item-name"
-        v-show="!(editingItem && editingItem === item)"
-        v-text="item.name"
-        @click.left="setEditingItem(item)"
-        >
-        </label>
-
-        <input class="die-item-name"
-        v-show="editingItem === item"
+        <textarea class="die-item-name" rows="1"
         @keydown.shift.delete.exact="die.removeDieItem(item)"
-        @blur="item.name.length === 0 ? die.removeDieItem(item) : ''; editingItem = null; item.trimExtraCharacters()"
+        @blur="item.name.length === 0 ? die.removeDieItem(item) : ''; item.trimExtraCharacters()"
         v-model="item.name"
         :disabled="!die.checkLockOrEnabled()"
-        v-edit-item-focus="editingItem === item"
-        >
+        maxlength="64"
+        />
         <button :disabled="!die.checkLockOrEnabled()" class="die-action-button remove-item-button" @click.left="die.removeDieItem(item)">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 10h24v4h-24z"/></svg>
         </button>
@@ -84,21 +75,28 @@ export default {
       type: Object
     }
   },
-
-  // meant to be shared among all Die components
-  data: function () {
-    return { editingItem: null }
-  },
   methods: {
     checkForInput: function (item) {
       if (item.length <= 0) {
         this.die.removeDieItem(item)
       }
     },
-    setEditingItem: function (item) {
-      if (this.die.locked || !this.die.enabled) return
+    checkForLabel: function (index) {
+      this.$nextTick(function () {
+        const container = this.$refs.itemName[index]
+        const label = container.querySelector('textarea.die-item-name')
 
-      this.editingItem = item
+        const estimatedNumberOfLines = label.value.length / 20
+        if (estimatedNumberOfLines > 1) container.style.gridRow = `auto / span ${estimatedNumberOfLines > 1 && estimatedNumberOfLines < 2 ? 2 : Math.floor(estimatedNumberOfLines)}`
+        else container.style.gridRow = ''
+      })
+    },
+
+    updateLabels: function () {
+      const dieItems = this.$refs.itemName
+      for (let index = 0; index < dieItems.length; index++) {
+        this.checkForLabel(index)
+      }
     },
     checkForLabel: function (index) {
       this.$nextTick(function () {
@@ -122,12 +120,6 @@ export default {
     }
   },
   directives: {
-    'edit-item-focus': function (el, binding) {
-      if (binding.value) { el.focus() }
-    },
-    'edit-die-focus': function (el, binding) {
-      if (binding.value) { el.focus() }
-    },
     'tooltip': VTooltip
   },
   mounted () {
@@ -168,7 +160,7 @@ export default {
   display: grid;
   grid-gap: 10px;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  grid-auto-rows: minmax(70px, auto);
+  grid-auto-rows: minmax(48px, auto);
   grid-auto-flow: row dense;
 }
 

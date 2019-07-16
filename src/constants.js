@@ -130,21 +130,21 @@ export const ideasStorageInstance = localforage.createInstance({
 })
 
 export const MAXIMUM_NAME_LENGTH = 256
+export const DIE_NAME_MAXIMUM_LENGTH = 64
 
 export class Die {
-  MAX_LENGTH = 64
-
   /**
    * A die object that holds die item that represents faces of the die.
    * @param {Object} object - a destructured object that contains the option for
    *                          building the Die
    */
   constructor ({ id = generateId(), name = id, items = [], enabled = true, locked = false } = {}) {
-    this.name = name
+    this.name = String(name)
     // trimming the name if it goes over the maximum length
     this.trimExtraCharacters()
 
-    this.id = id
+    if (typeof id === 'number') this.id = convertToProgramNumberSystem(id)
+    else this.id = String(id)
 
     this.items = []
     for (const dieItem of items) {
@@ -195,17 +195,17 @@ export class Die {
   }
 
   trimExtraCharacters () {
-    if (this.name.length > this.MAX_LENGTH) {
-      this.name = this.name.slice(0, this.MAX_LENGTH)
+    if (this.name.length > DIE_NAME_MAXIMUM_LENGTH) {
+      this.name = this.name.slice(0, DIE_NAME_MAXIMUM_LENGTH)
     }
 
     this.name = this.name.trim()
   }
 }
 
-export class DieItem {
-  MAX_LENGTH = 64
+export const DIE_ITEM_NAME_MAX_LENGTH = 64
 
+export class DieItem {
   /**
    * A die item is a basically like a face on the die object.
    * @param {Object} options
@@ -223,16 +223,17 @@ export class DieItem {
   }
 
   trimExtraCharacters () {
-    if (this.name.length > this.MAX_LENGTH) {
-      this.name = this.name.slice(0, this.MAX_LENGTH)
+    if (this.name.length > DIE_ITEM_NAME_MAX_LENGTH) {
+      this.name = this.name.slice(0, DIE_ITEM_NAME_MAX_LENGTH)
     }
 
     this.name = this.name.trim()
   }
 }
 
+export const IDEA_SET_NAME_MAX_LENGTH = 64
+
 export class IdeaSet {
-  MAX_LENGTH = 64
   /**
    * An idea set made up of the results from 'rolling of the dice set'.
    * @param {Object} options - an object that specifies options for building
@@ -254,8 +255,8 @@ export class IdeaSet {
   }
 
   trimExtraCharacters () {
-    if (this.name.length > this.MAX_LENGTH) {
-      this.name = this.name.slice(0, this.MAX_LENGTH)
+    if (this.name.length > IDEA_SET_NAME_MAX_LENGTH) {
+      this.name = this.name.slice(0, IDEA_SET_NAME_MAX_LENGTH)
     }
 
     this.name = this.name.trim()
